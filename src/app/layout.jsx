@@ -12,8 +12,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "CodeExchanger",
-  description: "Created By Shams Ali",
+  title: "DevCodeHub | Team Code Exchange Platform",
+  description:
+    "DevCodeHub is a collaborative platform where development teams can quickly share, exchange, and manage small code snippets to improve productivity and teamwork.",
+  keywords: [
+    "DevCodeHub",
+    "code exchange",
+    "team collaboration",
+    "developer tools",
+    "code snippets",
+    "programming collaboration",
+  ],
+  authors: [{ name: "Shams Ali Shaikh" }],
 };
 
 export default function RootLayout({ children }) {
@@ -24,22 +34,23 @@ export default function RootLayout({ children }) {
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href="facicons/apple-touch-icon.png"
+          href="/favicons/apple-touch-icon.png"
         />
         <link
           rel="icon"
           type="image/png"
           sizes="32x32"
-          href="favicons/favicon-32x32.png"
+          href="/favicons/favicon-32x32.png"
         />
         <link
           rel="icon"
           type="image/png"
           sizes="16x16"
-          href="favicons/favicon-16x16.png"
+          href="/favicons/favicon-16x16.png"
         />
         <link rel="manifest" href="/site.webmanifest" />
       </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
