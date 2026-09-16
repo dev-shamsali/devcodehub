@@ -16,7 +16,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, Transition } from '@headlessui/react';
 
 const THIRTY_SIX_HOURS_MS = 36 * 60 * 60 * 1000;
-const MASTER_DELETE_PASSWORD = 'Shams@17';
 
 export default function NoteList({ onSelect, onDelete }) {
   const [notes, setNotes] = useState([]);
@@ -48,6 +47,15 @@ export default function NoteList({ onSelect, onDelete }) {
   const [masterModalOpen, setMasterModalOpen] = useState(false);
   const [masterValue, setMasterValue] = useState('');
   const [masterError, setMasterError] = useState('');
+  const [masterChecking, setMasterChecking] = useState(false);
+
+  // Relative timestamps need a clock, but reading Date.now() during render is
+  // impure and desyncs on re-render. Sample it on an interval instead.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   /* -------------------- LOAD & AUTO-CLEAN -------------------- */
   useEffect(() => {
@@ -150,7 +158,7 @@ export default function NoteList({ onSelect, onDelete }) {
 
   const formatDate = (ts) => {
     const d = new Date(ts);
-    const diff = Date.now() - d.getTime();
+    const diff = now - d.getTime();
     if (diff < 60_000) return 'Just now';
     if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
     if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
@@ -343,12 +351,26 @@ export default function NoteList({ onSelect, onDelete }) {
   };
 
   const confirmMasterDelete = async () => {
-    if (masterValue !== MASTER_DELETE_PASSWORD) {
-      setMasterError('Incorrect master password.');
-      return;
+    setMasterError('');
+    setMasterChecking(true);
+    try {
+      const res = await fetch('/api/master-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: masterValue }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        setMasterError(data.error || 'Incorrect master password.');
+        return;
+      }
+      await deleteNotes(notes.map((n) => n.id));
+      setMasterModalOpen(false);
+    } catch {
+      setMasterError('Could not reach the server. Try again.');
+    } finally {
+      setMasterChecking(false);
     }
-    await deleteNotes(notes.map((n) => n.id));
-    setMasterModalOpen(false);
   };
 
   /* -------------------- PIN MODAL CONFIRM -------------------- */
@@ -418,33 +440,33 @@ export default function NoteList({ onSelect, onDelete }) {
 
   return (
     <>
-      <div className="flex flex-col h-full bg-[#f8f9fa] border-r border-gray-200 text-gray-900">
+      <div className="flex h-full flex-col text-text-hi">
         {/* HEADER */}
-        <div className="bg-white px-4 py-3 border-b flex items-center justify-between sticky top-0 z-30">
+        <div className="bg-ink-800/85 backdrop-blur-xl px-4 py-3 border-b border-white/8 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-2">
-            <FolderOpen className="w-5 h-5 text-blue-600" />
+            <FolderOpen className="w-5 h-5 text-brand" />
             <h2 className="text-base font-semibold">Codes</h2>
           </div>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-text-lo">
             Total: {notes.length}
           </span>
         </div>
 
         {/* SEARCH */}
-        <div className="bg-white px-4 py-3 border-b sticky top-[44px] z-20">
+        <div className="bg-ink-800/85 backdrop-blur-xl px-4 py-3 border-b border-white/8 sticky top-[44px] z-20">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-lo" />
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search codes..."
-              className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm text-black focus:ring-2 focus:ring-blue-200 outline-none"
+              className="w-full rounded-[10px] border border-white/10 bg-white/[0.04] py-2 pl-9 pr-3 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
             />
           </div>
         </div>
 
         {/* ADD + BULK */}
-        <div className="bg-white px-4 py-3 border-b sticky top-[92px] z-20 space-y-2">
+        <div className="bg-ink-800/85 backdrop-blur-xl px-4 py-3 border-b border-white/8 sticky top-[92px] z-20 space-y-2">
           <div className="flex gap-2">
             <input
               value={newNoteName}
@@ -454,42 +476,42 @@ export default function NoteList({ onSelect, onDelete }) {
               }}
               onKeyDown={(e) => e.key === 'Enter' && createNote()}
               placeholder="New code name..."
-              className="flex-1 px-3 py-2 border rounded-lg text-sm text-black focus:ring-2 focus:ring-blue-200 outline-none"
+              className="flex-1 rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
             />
             <button
               onClick={createNote}
               disabled={!newNoteName.trim() || isCreating}
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:bg-gray-300"
+              className="px-4 py-2 rounded-lg bg-brand-solid text-white text-sm font-medium hover:bg-brand-solid-hover disabled:bg-white/[0.10] disabled:text-text-lo"
             >
               {isCreating ? '...' : 'Add'}
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-600">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-mid">
             <span>Selected: {selectedIds.size}</span>
             <button
               onClick={selectAll}
-              className="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200"
+              className="px-2 py-1 rounded bg-white/[0.06] hover:bg-white/[0.10]"
             >
               Select all
             </button>
             <button
               onClick={clearSelection}
-              className="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200"
+              className="px-2 py-1 rounded bg-white/[0.06] hover:bg-white/[0.10]"
             >
               Clear
             </button>
             <button
               onClick={deleteSelected}
               disabled={!selectedIds.size}
-              className="px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-40"
+              className="px-2 py-1 rounded bg-brand/10 text-brand-soft hover:bg-brand/15 disabled:opacity-40"
             >
               Delete selected
             </button>
             <button
               onClick={openMasterDeleteModal}
               disabled={!notes.length}
-              className="px-3 py-1.5 rounded bg-red-600 text-white text-xs font-semibold hover:bg-red-700 disabled:opacity-40"
+              className="px-3 py-1.5 rounded bg-brand-solid text-white text-xs font-semibold hover:bg-brand-solid-hover disabled:opacity-40"
             >
               Delete all
             </button>
@@ -499,11 +521,11 @@ export default function NoteList({ onSelect, onDelete }) {
         {/* LIST */}
         <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
           {loading ? (
-            <div className="text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-8 text-text-lo text-sm">
               Loading…
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-8 text-text-lo text-sm">
               No codes found.
             </div>
           ) : (
@@ -511,7 +533,7 @@ export default function NoteList({ onSelect, onDelete }) {
               <motion.div
                 key={note.id}
                 layout
-                className="flex items-center justify-between bg-white border rounded-md px-3 py-2 hover:bg-gray-50 hover:shadow-sm transition-all"
+                className="flex items-center justify-between rounded-[10px] border border-white/8 bg-white/[0.025] px-3 py-2 transition-colors hover:border-white/14 hover:bg-white/[0.06]"
               >
                 {/* Checkbox */}
                 <input
@@ -532,16 +554,16 @@ export default function NoteList({ onSelect, onDelete }) {
                       : onSelect?.(note.id, note.name)
                   }
                 >
-                  <div className="flex items-center gap-2 text-sm font-medium text-black">
+                  <div className="flex items-center gap-2 text-sm font-medium text-text-hi">
                     <span className="truncate">{note.name}</span>
                     {note.pinned && (
-                      <Pin className="w-4 h-4 text-yellow-500" />
+                      <Pin className="w-4 h-4 text-brand-soft" />
                     )}
                     {note.locked && (
-                      <Lock className="w-4 h-4 text-gray-600" />
+                      <Lock className="w-4 h-4 text-text-mid" />
                     )}
                   </div>
-                  <p className="text-[10px] text-gray-500">
+                  <p className="text-[10px] text-text-lo">
                     Modified {formatDate(note.lastModified)}
                   </p>
                 </div>
@@ -554,9 +576,9 @@ export default function NoteList({ onSelect, onDelete }) {
                         dropdownOpen === note.id ? null : note.id
                       )
                     }
-                    className="p-1.5 rounded-md hover:bg-gray-100"
+                    className="p-1.5 rounded-md hover:bg-white/[0.06]"
                   >
-                    <MoreVertical className="w-4 h-4 text-gray-700" />
+                    <MoreVertical className="w-4 h-4 text-text-mid" />
                   </button>
 
                   <AnimatePresence>
@@ -566,14 +588,14 @@ export default function NoteList({ onSelect, onDelete }) {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -6 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden text-black"
+                        className="glass absolute right-0 top-full mt-1 w-40 z-50 overflow-hidden text-text-hi"
                       >
                         <button
                           onClick={() => {
                             handleTogglePin(note);
                             setDropdownOpen(null);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-100"
+                          className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
                         >
                           {note.pinned ? (
                             <PinOff className="w-4 h-4" />
@@ -589,7 +611,7 @@ export default function NoteList({ onSelect, onDelete }) {
                               openUnlockModal(note);
                               setDropdownOpen(null);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-100"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
                           >
                             <Unlock className="w-4 h-4" />
                             Unlock
@@ -600,7 +622,7 @@ export default function NoteList({ onSelect, onDelete }) {
                               openSetLockModal(note);
                               setDropdownOpen(null);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-100"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
                           >
                             <Lock className="w-4 h-4" />
                             Lock with PIN
@@ -626,7 +648,7 @@ export default function NoteList({ onSelect, onDelete }) {
                             }
                             setDropdownOpen(null);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-100"
+                          className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
                         >
                           ✏️ Rename
                         </button>
@@ -636,7 +658,7 @@ export default function NoteList({ onSelect, onDelete }) {
                             openDeleteLockedModal(note);
                             setDropdownOpen(null);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50"
+                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-brand-soft hover:bg-brand/10"
                         >
                           🗑️ Delete
                         </button>
@@ -650,7 +672,7 @@ export default function NoteList({ onSelect, onDelete }) {
         </div>
 
         {error && (
-          <p className="text-center text-xs text-red-600 py-2">
+          <p className="text-center text-xs text-brand-soft py-2">
             {error}
           </p>
         )}
@@ -674,7 +696,7 @@ export default function NoteList({ onSelect, onDelete }) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/30" />
+            <div className="fixed inset-0 bg-ink-900/70 backdrop-blur-sm" />
           </Transition.Child>
 
           <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -687,14 +709,14 @@ export default function NoteList({ onSelect, onDelete }) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-xs rounded-xl bg-white p-4 shadow-lg">
-                <Dialog.Title className="text-sm font-semibold text-gray-900 mb-1">
+              <Dialog.Panel className="glass w-full max-w-xs p-4">
+                <Dialog.Title className="text-sm font-semibold text-text-hi mb-1">
                   {pinModal.action === 'setLock' && 'Set PIN (optional)'}
                   {pinModal.action === 'unlock' && 'Unlock code'}
                   {pinModal.action === 'open' && 'Enter PIN to open'}
                   {pinModal.action === 'delete' && 'Enter PIN to delete'}
                 </Dialog.Title>
-                <p className="text-[11px] text-gray-500 mb-2">
+                <p className="text-[11px] text-text-lo mb-2">
                   {pinModal.action === 'setLock'
                     ? 'Leave empty to lock without PIN, or enter a 4-digit PIN.'
                     : 'Enter the 4-digit PIN for this code.'}
@@ -707,11 +729,11 @@ export default function NoteList({ onSelect, onDelete }) {
                     setPinError('');
                   }}
                   maxLength={4}
-                  className="w-full px-3 py-2 border rounded-lg text-sm text-black focus:ring-2 focus:ring-blue-200 outline-none"
+                  className="w-full rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
                   autoFocus
                 />
                 {pinError && (
-                  <p className="text-[10px] text-red-600 mt-1">
+                  <p className="text-[10px] text-brand-soft mt-1">
                     {pinError}
                   </p>
                 )}
@@ -724,13 +746,13 @@ export default function NoteList({ onSelect, onDelete }) {
                         noteId: null,
                       })
                     }
-                    className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200"
+                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10]"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handlePinModalConfirm}
-                    className="px-3 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700"
+                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover"
                   >
                     Confirm
                   </button>
@@ -759,7 +781,7 @@ export default function NoteList({ onSelect, onDelete }) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/25" />
+            <div className="fixed inset-0 bg-ink-900/70 backdrop-blur-sm" />
           </Transition.Child>
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <Transition.Child
@@ -771,11 +793,11 @@ export default function NoteList({ onSelect, onDelete }) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-xs rounded-xl bg-white p-4 shadow-lg">
-                <Dialog.Title className="text-sm font-semibold text-gray-900">
+              <Dialog.Panel className="glass w-full max-w-xs p-4">
+                <Dialog.Title className="text-sm font-semibold text-text-hi">
                   Confirm
                 </Dialog.Title>
-                <p className="text-[11px] text-gray-600 mt-1">
+                <p className="text-[11px] text-text-mid mt-1">
                   {confirmModal.message}
                 </p>
                 <div className="mt-3 flex justify-end gap-2">
@@ -787,7 +809,7 @@ export default function NoteList({ onSelect, onDelete }) {
                         onConfirm: null,
                       })
                     }
-                    className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200"
+                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10]"
                   >
                     Cancel
                   </button>
@@ -800,7 +822,7 @@ export default function NoteList({ onSelect, onDelete }) {
                         onConfirm: null,
                       });
                     }}
-                    className="px-3 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700"
+                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover"
                   >
                     Yes
                   </button>
@@ -827,7 +849,7 @@ export default function NoteList({ onSelect, onDelete }) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/40" />
+            <div className="fixed inset-0 bg-ink-900/70 backdrop-blur-sm" />
           </Transition.Child>
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <Transition.Child
@@ -839,11 +861,11 @@ export default function NoteList({ onSelect, onDelete }) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-xs rounded-xl bg-white p-4 shadow-lg">
-                <Dialog.Title className="text-sm font-semibold text-red-600">
+              <Dialog.Panel className="glass w-full max-w-xs p-4">
+                <Dialog.Title className="text-sm font-semibold text-brand-soft">
                   Delete ALL codes
                 </Dialog.Title>
-                <p className="text-[11px] text-gray-600 mt-1">
+                <p className="text-[11px] text-text-mid mt-1">
                   This will delete <b>all</b> codes including pinned and locked.
                   Enter master password to continue.
                 </p>
@@ -854,26 +876,27 @@ export default function NoteList({ onSelect, onDelete }) {
                     setMasterValue(e.target.value);
                     setMasterError('');
                   }}
-                  className="w-full mt-2 px-3 py-2 border rounded-lg text-sm text-black focus:ring-2 focus:ring-red-200 outline-none"
+                  className="mt-2 w-full rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
                   placeholder="Master password"
                 />
                 {masterError && (
-                  <p className="text-[10px] text-red-600 mt-1">
+                  <p className="text-[10px] text-brand-soft mt-1">
                     {masterError}
                   </p>
                 )}
                 <div className="mt-3 flex justify-end gap-2">
                   <button
                     onClick={() => setMasterModalOpen(false)}
-                    className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200"
+                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10]"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={confirmMasterDelete}
-                    className="px-3 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700"
+                    disabled={masterChecking}
+                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover disabled:opacity-60"
                   >
-                    Delete all
+                    {masterChecking ? 'Checking...' : 'Delete all'}
                   </button>
                 </div>
               </Dialog.Panel>

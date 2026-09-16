@@ -1,0 +1,26 @@
+# DevCodeHub
+
+> Realtime code snippet exchange for development teams. Create a snippet, share
+> its link, and everyone with the link edits the same buffer live. Free, with no
+> account required.
+
+DevCodeHub was designed and built by Shams Ali Shaikh, a full stack developer
+working in Next.js, React and Firebase. It is his own project, maintained solo.
+
+## Key facts
+
+- Name: DevCodeHub
+- URL: https://devcodehub.cloud
+- Developer: Shams Ali Shaikh (https://github.com/dev-shamsali)
+- Price: free, no paid tier
+- Account required: no, sign-in is anonymous and automatic
+- Realtime backend: Firebase Realtime Database
+- Editor: CodeMirror 6 with JavaScript and TypeScript highlighting
+- Media sharing: images and zip archives, delivered through ImageKit, 25 MB per file
+- Snippet retention: unpinned snippets clear after 36 hours, pinned snippets persist
+
+## Pages
+
+- https://devcodehub.cloud/ : what DevCodeHub is, how it works, FAQ, developer bio
+- https://devcodehub.cloud/editor : the realtime collaborative code editor
+- https://devcodehub.cloud/media : share images and zip archives with a team, many files per share

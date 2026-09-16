@@ -10,12 +10,19 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 
-import { Copy, Check, Loader2, Code2, Wifi, WifiOff, Sparkles } from 'lucide-react';
+import { Copy, Check, Loader2, Wifi, WifiOff } from 'lucide-react';
+import { AUTHOR } from '@/lib/site';
 
 export default function CodeEditor({ noteId }) {
   const editorContainerRef = useRef(null);
   const viewRef = useRef(null);
-  const [isRemoteUpdate, setIsRemoteUpdate] = useState(false);
+
+  // Kept in a ref, not state: this flag guards the write-back inside the
+  // CodeMirror update listener. As state it both went stale in the listener
+  // closure and, being an effect dependency, tore the editor down and rebuilt
+  // it on every remote edit.
+  const isRemoteUpdate = useRef(false);
+
   const [copied, setCopied] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -34,9 +41,8 @@ export default function CodeEditor({ noteId }) {
   }, []);
 
   const updateStats = useCallback((doc) => {
-    const content = doc.toString();
     setLineCount(doc.lines);
-    setCharCount(content.length);
+    setCharCount(doc.toString().length);
   }, []);
 
   useEffect(() => {
@@ -51,43 +57,37 @@ export default function CodeEditor({ noteId }) {
         history(),
         javascript(),
         oneDark,
+        EditorView.lineWrapping,
         keymap.of([...defaultKeymap, ...historyKeymap]),
         EditorView.updateListener.of((updateEvent) => {
-          if (updateEvent.docChanged) {
-            updateStats(updateEvent.state.doc);
-            if (!isRemoteUpdate) {
-              setIsSaving(true);
-              const currentCode = updateEvent.state.doc.toString();
-              update(noteRef, { content: currentCode }).finally(() =>
-                setTimeout(() => setIsSaving(false), 300)
-              );
-            }
-          }
+          if (!updateEvent.docChanged) return;
+          updateStats(updateEvent.state.doc);
+          if (isRemoteUpdate.current) return;
+
+          setIsSaving(true);
+          update(noteRef, { content: updateEvent.state.doc.toString() }).finally(
+            () => setTimeout(() => setIsSaving(false), 300)
+          );
         }),
       ],
     });
 
-    const view = new EditorView({
-      state,
-      parent: editorContainerRef.current,
-    });
-
+    const view = new EditorView({ state, parent: editorContainerRef.current });
     viewRef.current = view;
 
     const unsubscribe = onValue(
       noteRef,
       (snapshot) => {
         setIsConnected(true);
-        const data = snapshot.val();
-        const content = data?.content || '';
-        if (view.state.doc.toString() !== content) {
-          setIsRemoteUpdate(true);
-          view.dispatch({
-            changes: { from: 0, to: view.state.doc.length, insert: content },
-          });
-          updateStats(view.state.doc);
-          setIsRemoteUpdate(false);
-        }
+        const content = snapshot.val()?.content || '';
+        if (view.state.doc.toString() === content) return;
+
+        isRemoteUpdate.current = true;
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: content },
+        });
+        updateStats(view.state.doc);
+        isRemoteUpdate.current = false;
       },
       (error) => {
         setIsConnected(false);
@@ -96,85 +96,81 @@ export default function CodeEditor({ noteId }) {
     );
 
     return () => {
-      view?.destroy();
+      unsubscribe();
       off(noteRef);
+      view.destroy();
+      viewRef.current = null;
     };
-  }, [noteId, isRemoteUpdate, updateStats]);
+  }, [noteId, updateStats]);
 
   return (
-    <div className="min-h-screen bg-[#1e1e1e] p-4 text-gray-200">
-      <div className="max-w-6xl mx-auto space-y-2">
-        {/* Header */}
-        <div className="flex justify-between items-center px-4 py-3 bg-[#252526] rounded-t-lg border-b border-gray-700">
-          <div className="flex items-center gap-3">
-            <Code2 className="w-6 h-6 text-blue-400" />
-            <div>
-              <h1 className="text-lg font-semibold">Code Editor</h1>
-              <p className="text-xs text-gray-400">Realtime collaborative editing</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1">
-              {isConnected ? (
-                <>
-                  <Wifi className="w-4 h-4 text-green-400" />
-                  <span className="text-green-400">Connected</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff className="w-4 h-4 text-red-400" />
-                  <span className="text-red-400">Disconnected</span>
-                </>
-              )}
-            </div>
-            {isSaving && (
-              <div className="flex items-center gap-1 text-blue-400">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Saving...</span>
-              </div>
-            )}
-          </div>
-        </div>
+    <div className="glass flex h-full min-h-[26rem] flex-col overflow-hidden">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 px-4 py-3">
+        <span className="flex items-center gap-2 text-[0.78rem]">
+          {isConnected ? (
+            <>
+              <Wifi className="h-3.5 w-3.5 text-emerald-400" strokeWidth={1.75} />
+              <span className="text-text-mid">Live</span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="h-3.5 w-3.5 text-brand" strokeWidth={1.75} />
+              <span className="text-brand-soft">Reconnecting</span>
+            </>
+          )}
+        </span>
 
-        {/* Editor */}
-        <div
-          ref={editorContainerRef}
-          className="rounded-b-lg border border-gray-700 overflow-y-auto h-[500px]"
-        />
+        <div className="flex items-center gap-4">
+          <span
+            className={`flex items-center gap-1.5 text-[0.74rem] text-text-lo transition-opacity ${
+              isSaving ? 'opacity-100' : 'opacity-0'
+            }`}
+            aria-live="polite"
+          >
+            <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.75} />
+            Saving
+          </span>
 
-        {/* Footer */}
-        <div className="flex justify-between items-center bg-[#252526] px-4 py-2 rounded-lg border border-gray-700">
-          <div className="flex gap-4 text-xs text-gray-400">
-            <span>Lines: <span className="text-gray-200">{lineCount}</span></span>
-            <span>Chars: <span className="text-gray-200">{charCount}</span></span>
-            <div className="flex items-center gap-1 text-[10px] text-gray-500">
-              <Sparkles className="w-3 h-3 text-yellow-400" />
-              Developed by <span className="text-gray-300 font-semibold ml-1">Shams Ali</span>
-            </div>
-          </div>
           <button
             onClick={handleCopy}
-            disabled={copied}
-            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-colors ${
-              copied
-                ? 'bg-green-600 text-white'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.05] px-3.5 py-1.5 text-[0.78rem] text-text-hi transition-colors hover:border-white/20 hover:bg-white/10 active:translate-y-px"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4" />
+                <Check className="h-3.5 w-3.5 text-emerald-400" strokeWidth={2} />
                 Copied
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4" />
-                Copy Code
+                <Copy className="h-3.5 w-3.5" strokeWidth={1.75} />
+                Copy
               </>
             )}
           </button>
         </div>
-      </div>
+      </header>
+
+      <div ref={editorContainerRef} className="min-h-0 flex-1 overflow-auto" />
+
+      <footer className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-t border-white/8 px-4 py-2.5 font-mono text-[0.72rem] text-text-lo">
+        <span className="flex gap-4">
+          <span>
+            {lineCount} {lineCount === 1 ? 'line' : 'lines'}
+          </span>
+          <span>{charCount} chars</span>
+        </span>
+        <span>
+          Built by{' '}
+          <a
+            href={AUTHOR.github}
+            rel="author me noopener noreferrer"
+            target="_blank"
+            className="text-text-mid transition-colors hover:text-brand-soft"
+          >
+            {AUTHOR.name}
+          </a>
+        </span>
+      </footer>
     </div>
   );
 }

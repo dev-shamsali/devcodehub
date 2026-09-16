@@ -132,7 +132,7 @@ export default function PresenceList({ noteId }) {
     return (
       <div className="bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 p-6 text-center">
         <Globe className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-        <p className="text-gray-500 text-sm">Select a note to see who's online</p>
+        <p className="text-gray-500 text-sm">Select a note to see who&rsquo;s online</p>
       </div>
     );
   }

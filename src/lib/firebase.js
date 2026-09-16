@@ -1,24 +1,25 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
-import { getAnalytics } from 'firebase/analytics';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBm0GQiG5PEXToqlTmUTz71dTt3cJKTVTY",
-  authDomain: "code-editor-6d459.firebaseapp.com",
-  projectId: "code-editor-6d459",
-  storageBucket: "code-editor-6d459.appspot.com",
-  messagingSenderId: "790109384425",
-  appId: "1:790109384425:web:a38b04d2b74ce671d50a78",
-  measurementId: "G-SV9DPVS83N"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig); // ✅ export app
+// Reuse the existing app across Fast Refresh / RSC boundaries.
+export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Realtime Database setup
 export const database = getDatabase(app);
 
-// Optional: Analytics
 if (typeof window !== 'undefined') {
-  getAnalytics(app);
+  isSupported().then((ok) => {
+    if (ok) getAnalytics(app);
+  });
 }
