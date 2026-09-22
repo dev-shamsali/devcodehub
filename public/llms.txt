@@ -11,7 +11,7 @@ working in Next.js, React and Firebase. It is his own project, maintained solo.
 
 - Name: DevCodeHub
 - URL: https://devcodehub.cloud
-- Developer: Shams Ali Shaikh (https://github.com/dev-shamsali)
+- Developer: Shams Ali Shaikh (https://github.com/dev-shamsali, https://www.linkedin.com/in/shams-ali-shaikh-27194425a/)
 - Price: free, no paid tier
 - Account required: no, sign-in is anonymous and automatic
 - Realtime backend: Firebase Realtime Database
@@ -21,6 +21,6 @@ working in Next.js, React and Firebase. It is his own project, maintained solo.
 
 ## Pages
 
-- https://devcodehub.cloud/ : what DevCodeHub is, how it works, FAQ, developer bio
-- https://devcodehub.cloud/editor : the realtime collaborative code editor
+- https://devcodehub.cloud/ : the realtime collaborative code editor
+- https://devcodehub.cloud/info : what DevCodeHub is, how it works, FAQ, developer bio
 - https://devcodehub.cloud/media : share images and zip archives with a team, many files per share

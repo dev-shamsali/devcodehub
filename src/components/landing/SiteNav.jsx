@@ -7,10 +7,10 @@ import { Menu, X } from 'lucide-react';
 import Wordmark from './Wordmark';
 
 const LINKS = [
-  { href: '/#features', label: 'Features' },
-  { href: '/#workflow', label: 'Workflow' },
+  { href: '/info#features', label: 'Features' },
+  { href: '/info#workflow', label: 'Workflow' },
   { href: '/media', label: 'Media' },
-  { href: '/#faq', label: 'FAQ' },
+  { href: '/info#faq', label: 'FAQ' },
 ];
 
 export default function SiteNav() {
@@ -57,7 +57,7 @@ export default function SiteNav() {
 
           <div className="flex items-center gap-2">
             <Link
-              href="/editor"
+              href="/"
               className="hidden rounded-full bg-brand-solid px-4 py-2 text-[0.86rem] font-medium text-white transition-all hover:bg-brand-solid-hover active:translate-y-px sm:block"
             >
               Open editor
@@ -100,7 +100,7 @@ export default function SiteNav() {
           ))}
           <li className="pt-2">
             <Link
-              href="/editor"
+              href="/"
               onClick={() => setOpen(false)}
               className="block rounded-full bg-brand-solid px-4 py-2.5 text-center text-sm font-medium text-white"
             >

@@ -6,8 +6,8 @@ export default function robots() {
       {
         userAgent: '*',
         allow: '/',
-        // Only the API is withheld. /editor is crawlable on purpose: it is the
-        // page brand searchers want, so it has to be eligible to rank.
+        // Only the API is withheld. / is the editor and crawlable on purpose:
+        // it is the page brand searchers want, so it has to be eligible to rank.
         disallow: ['/api/'],
       },
     ],

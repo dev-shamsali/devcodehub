@@ -38,7 +38,7 @@ export default function EditorWorkspace() {
       >
         <div className="flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3.5">
           <Link
-            href="/"
+            href="/info"
             className="flex items-center gap-2 text-text-mid transition-colors hover:text-text-hi"
           >
             <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />

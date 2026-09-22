@@ -20,7 +20,7 @@ export default function ClosingCta() {
               entire setup.
             </p>
             <Link
-              href="/editor"
+              href="/"
               className="group mt-9 inline-flex items-center gap-2 rounded-full bg-brand-solid px-7 py-3.5 text-[0.96rem] font-medium text-white transition-all hover:bg-brand-solid-hover active:translate-y-px"
             >
               Open editor

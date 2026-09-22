@@ -46,7 +46,7 @@ export default function MediaWorkspace() {
       >
         <div className="flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3.5">
           <Link
-            href="/"
+            href="/info"
             className="flex items-center gap-2 text-text-mid transition-colors hover:text-text-hi"
           >
             <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
@@ -83,7 +83,7 @@ export default function MediaWorkspace() {
 
           <div className="ml-auto flex items-center gap-4">
             <Link
-              href="/editor"
+              href="/"
               className="inline-flex items-center gap-1.5 text-[0.82rem] text-text-mid transition-colors hover:text-text-hi"
             >
               <Code2 className="h-3.5 w-3.5" strokeWidth={1.75} />

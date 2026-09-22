@@ -65,7 +65,7 @@ export default function Hero() {
 
           <motion.div {...rise(0.16)} className="mt-9 flex flex-wrap items-center gap-3">
             <Link
-              href="/editor"
+              href="/"
               className="group inline-flex items-center gap-2 rounded-full bg-brand-solid px-6 py-3 text-[0.94rem] font-medium text-white transition-all hover:bg-brand-solid-hover active:translate-y-px"
             >
               Open editor

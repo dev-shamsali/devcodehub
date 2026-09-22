@@ -391,7 +391,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
                         )}
                       </button>
                       <a
-                        href={`${file.url}?ik-attachment=true`}
+                        href={`/api/media/download?url=${encodeURIComponent(file.url)}&name=${encodeURIComponent(file.name)}`}
                         download={file.name}
                         rel="noopener noreferrer"
                         className="rounded p-1 text-text-lo transition-colors hover:bg-white/10 hover:text-text-hi"

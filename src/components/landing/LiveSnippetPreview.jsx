@@ -103,7 +103,6 @@ export default function LiveSnippetPreview() {
       const burst = TYPED_TAIL.slice(index, index + (1 + Math.floor(Math.random() * 3)));
       view.dispatch({
         changes: { from: view.state.doc.length, insert: burst },
-        scrollIntoView: true,
       });
       index += burst.length;
       typeTimer = setTimeout(step, 26 + Math.random() * 46);
