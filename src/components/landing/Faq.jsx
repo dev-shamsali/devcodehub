@@ -22,10 +22,16 @@ export default function Faq() {
   return (
     <section id="faq" className="edge-top scroll-mt-20">
       <div className="mx-auto grid max-w-[1200px] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20 lg:py-28">
-        <h2 className="font-display text-3xl font-semibold leading-[1.12] tracking-[-0.025em] text-text-hi md:text-4xl lg:sticky lg:top-28 lg:self-start">
+        <motion.h2
+          initial={reduce ? false : { opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="font-display text-3xl font-semibold leading-[1.12] tracking-[-0.025em] text-text-hi md:text-4xl lg:sticky lg:top-28 lg:self-start"
+        >
           Questions people
           <br className="hidden lg:block" /> actually ask.
-        </h2>
+        </motion.h2>
 
         <div className="divide-y divide-white/8 border-y border-white/8">
           {FAQ.map((item, i) => {

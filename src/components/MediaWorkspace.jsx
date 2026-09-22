@@ -6,6 +6,7 @@ import { Menu, X, Code2, Images, ArrowLeft } from 'lucide-react';
 import MediaList from '@/components/MediaList';
 import MediaGallery from '@/components/MediaGallery';
 import Wordmark from '@/components/landing/Wordmark';
+import SocialLinks from '@/components/landing/SocialLinks';
 
 /**
  * Shell for /media. Same two-pane shape as the editor: a sidebar of shares on
@@ -81,13 +82,13 @@ export default function MediaWorkspace() {
           </button>
           <Wordmark className="text-[0.9rem] md:hidden" />
 
-          <div className="ml-auto flex items-center gap-4">
+          <div className="ml-auto flex items-center gap-3 sm:gap-4">
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 text-[0.82rem] text-text-mid transition-colors hover:text-text-hi"
             >
               <Code2 className="h-3.5 w-3.5" strokeWidth={1.75} />
-              Editor
+              <span className="hidden sm:inline">Editor</span>
             </Link>
             <a
               href="#about"
@@ -95,6 +96,8 @@ export default function MediaWorkspace() {
             >
               About
             </a>
+            <span aria-hidden="true" className="h-4 w-px bg-white/10" />
+            <SocialLinks />
           </div>
         </div>
 

@@ -26,7 +26,7 @@ export default function Hero() {
         className="pointer-events-none absolute left-[-16rem] top-[14rem] h-[30rem] w-[30rem] rounded-full bg-brand-deep/10 blur-[120px]"
       />
 
-      <div className="relative mx-auto grid max-w-[1200px] items-center gap-12 px-5 pb-20 pt-16 sm:px-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-16 lg:pb-28 lg:pt-24">
+      <div className="relative mx-auto grid max-w-[1200px] items-center gap-10 px-5 pb-14 pt-10 sm:px-8 lg:min-h-[calc(100dvh-68px)] lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-14 lg:py-16">
         <div>
           <motion.h1
             {...rise(0)}
@@ -64,22 +64,31 @@ export default function Hero() {
           </motion.p>
 
           <motion.div {...rise(0.16)} className="mt-9 flex flex-wrap items-center gap-3">
-            <Link
-              href="/"
-              className="group inline-flex items-center gap-2 rounded-full bg-brand-solid px-6 py-3 text-[0.94rem] font-medium text-white transition-all hover:bg-brand-solid-hover active:translate-y-px"
+            <motion.div
+              whileHover={reduce ? undefined : { y: -2 }}
+              whileTap={reduce ? undefined : { scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 22 }}
             >
-              Open editor
-              <ArrowRight
-                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                strokeWidth={2}
-              />
-            </Link>
-            <a
+              <Link
+                href="/"
+                className="group inline-flex items-center gap-2 rounded-full bg-brand-solid px-6 py-3 text-[0.94rem] font-medium text-white transition-colors hover:bg-brand-solid-hover"
+              >
+                Open editor
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                  strokeWidth={2}
+                />
+              </Link>
+            </motion.div>
+            <motion.a
               href="#workflow"
-              className="inline-flex items-center rounded-full border border-white/12 bg-white/[0.04] px-6 py-3 text-[0.94rem] text-text-hi transition-colors hover:border-white/20 hover:bg-white/[0.08] active:translate-y-px"
+              whileHover={reduce ? undefined : { y: -2 }}
+              whileTap={reduce ? undefined : { scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+              className="inline-flex items-center rounded-full border border-white/12 bg-white/[0.04] px-6 py-3 text-[0.94rem] text-text-hi transition-colors hover:border-white/20 hover:bg-white/[0.08]"
             >
               How it works
-            </a>
+            </motion.a>
           </motion.div>
         </div>
 

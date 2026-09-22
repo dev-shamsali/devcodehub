@@ -6,6 +6,7 @@ import { Menu, X, FileCode2, Images, ArrowLeft } from 'lucide-react';
 import NoteList from '@/components/NoteList';
 import CodeEditor from '@/components/CodeEditor';
 import Wordmark from '@/components/landing/Wordmark';
+import SocialLinks from '@/components/landing/SocialLinks';
 
 export default function EditorWorkspace() {
   const [selectedNoteId, setSelectedNoteId] = useState(null);
@@ -69,14 +70,16 @@ export default function EditorWorkspace() {
           </button>
           <Wordmark className="text-[0.9rem] md:hidden" />
 
-          <div className="ml-auto flex items-center gap-4">
+          <div className="ml-auto flex items-center gap-3 sm:gap-4">
             <Link
               href="/media"
               className="inline-flex items-center gap-1.5 text-[0.82rem] text-text-mid transition-colors hover:text-text-hi"
             >
               <Images className="h-3.5 w-3.5" strokeWidth={1.75} />
-              Media
+              <span className="hidden sm:inline">Media</span>
             </Link>
+            <span aria-hidden="true" className="h-4 w-px bg-white/10" />
+            <SocialLinks />
           </div>
         </div>
 

@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from 'motion/react';
 import { Radio, Link2, Pin, Lock, Download } from 'lucide-react';
+import SpotlightCard from './SpotlightCard';
 
 /**
  * Five capabilities, five cells. The grid is shaped to the content: a wide
@@ -47,14 +48,20 @@ export default function Features() {
   return (
     <section id="features" className="edge-top scroll-mt-20">
       <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-8 lg:py-28">
-        <div className="max-w-[34ch]">
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-[34ch]"
+        >
           <p className="mb-4 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-brand">
             What it does
           </p>
           <h2 className="font-display text-3xl font-semibold leading-[1.12] tracking-[-0.025em] text-text-hi md:text-4xl">
             Built for the code that moves between people.
           </h2>
-        </div>
+        </motion.div>
 
         <div className="mt-12 grid gap-4 md:grid-cols-3">
           {FEATURES.map((feature, i) => {
@@ -62,17 +69,19 @@ export default function Features() {
             const lit = feature.tone === 'lit';
 
             return (
-              <motion.article
+              <SpotlightCard
+                as={motion.article}
                 key={feature.title}
                 initial={reduce ? false : { opacity: 0, y: 22 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.25 }}
+                whileHover={reduce ? undefined : { y: -4 }}
                 transition={{
                   duration: 0.6,
                   delay: Math.min(i * 0.07, 0.28),
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className={`glass relative overflow-hidden p-6 sm:p-7 ${feature.span} ${
+                className={`glass overflow-hidden p-6 transition-shadow duration-300 hover:border-white/16 sm:p-7 ${feature.span} ${
                   lit ? 'glass-lit md:p-9' : ''
                 }`}
               >
@@ -109,7 +118,7 @@ export default function Features() {
                     {feature.body}
                   </p>
                 </div>
-              </motion.article>
+              </SpotlightCard>
             );
           })}
         </div>

@@ -22,6 +22,8 @@ export const AUTHOR = {
   bio: 'Shams Ali Shaikh is a full stack developer who builds realtime web products with Next.js, React and Firebase. He designed and built DevCodeHub to remove the friction of pasting snippets between chat apps during code review.',
   github: 'https://github.com/dev-shamsali',
   linkedin: 'https://www.linkedin.com/in/shams-ali-shaikh-27194425a/',
+  instagram: 'https://www.instagram.com/shamsss.in/',
+  portfolio: 'https://shamsali.devcodehub.cloud',
   knowsAbout: [
     'Next.js',
     'React',
@@ -78,7 +80,7 @@ export const jsonLd = {
     jobTitle: AUTHOR.role,
     description: AUTHOR.bio,
     url: `${SITE.url}/#developer`,
-    sameAs: [AUTHOR.github, AUTHOR.linkedin],
+    sameAs: [AUTHOR.github, AUTHOR.linkedin, AUTHOR.instagram, AUTHOR.portfolio],
     knowsAbout: AUTHOR.knowsAbout,
   }),
 

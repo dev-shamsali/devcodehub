@@ -1,3 +1,7 @@
+'use client';
+
+import { motion, useReducedMotion } from 'motion/react';
+
 /**
  * What the product is actually built on. Real logos from Simple Icons.
  *
@@ -13,16 +17,30 @@ const STACK = [
 ];
 
 export default function StackStrip() {
+  const reduce = useReducedMotion();
+
   return (
     <section className="edge-top" aria-label="Technology stack">
-      <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-7 px-5 py-12 sm:px-8 md:flex-row md:justify-between md:gap-10">
+      <motion.div
+        initial={reduce ? false : { opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, amount: 0.6 }}
+        transition={{ duration: 0.5 }}
+        className="mx-auto flex max-w-[1200px] flex-col items-center gap-7 px-5 py-12 sm:px-8 md:flex-row md:justify-between md:gap-10"
+      >
         <p className="max-w-[22ch] text-center text-[0.82rem] leading-relaxed text-text-lo md:text-left">
           Built on the stack your team already runs.
         </p>
 
         <ul className="flex flex-wrap items-center justify-center gap-x-9 gap-y-6 md:gap-x-11">
-          {STACK.map((tech) => (
-            <li key={tech.slug}>
+          {STACK.map((tech, i) => (
+            <motion.li
+              key={tech.slug}
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.8 }}
+              transition={{ duration: 0.4, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`https://cdn.simpleicons.org/${tech.slug}/a9a6b1`}
@@ -32,10 +50,10 @@ export default function StackStrip() {
                 loading="lazy"
                 className="h-[26px] w-[26px] opacity-70 transition-opacity duration-300 hover:opacity-100"
               />
-            </li>
+            </motion.li>
           ))}
         </ul>
-      </div>
+      </motion.div>
     </section>
   );
 }

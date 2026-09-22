@@ -27,14 +27,26 @@ export default function Workflow() {
   return (
     <section id="workflow" className="edge-top scroll-mt-20">
       <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-8 lg:py-28">
-        <h2 className="max-w-[24ch] font-display text-3xl font-semibold leading-[1.12] tracking-[-0.025em] text-text-hi md:text-4xl">
+        <motion.h2
+          initial={reduce ? false : { opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-[24ch] font-display text-3xl font-semibold leading-[1.12] tracking-[-0.025em] text-text-hi md:text-4xl"
+        >
           Three moves, start to finish.
-        </h2>
+        </motion.h2>
 
         <ol className="relative mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
-          {/* Connector. Desktop only, decorative. */}
-          <span
+          {/* Connector. Desktop only, decorative. Draws left to right as the
+              row enters view, tracing the order the three moves happen in. */}
+          <motion.span
             aria-hidden="true"
+            initial={reduce ? false : { scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            style={{ transformOrigin: 'left' }}
             className="absolute left-0 right-0 top-[9px] hidden h-px bg-gradient-to-r from-brand/45 via-white/12 to-transparent md:block"
           />
 

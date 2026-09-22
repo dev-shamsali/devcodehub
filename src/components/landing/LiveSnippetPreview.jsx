@@ -6,6 +6,7 @@ import { EditorView, lineNumbers } from '@codemirror/view';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { useReducedMotion } from 'motion/react';
+import SpotlightCard from './SpotlightCard';
 
 /**
  * A real CodeMirror 6 instance, read only, running the same extensions the
@@ -121,7 +122,7 @@ export default function LiveSnippetPreview() {
   }, [reduce]);
 
   return (
-    <div className="glass glass-lit overflow-hidden">
+    <SpotlightCard as="div" className="glass glass-lit overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3">
         <span className="truncate font-mono text-[0.78rem] text-text-mid">
           retry-with-backoff.js
@@ -148,8 +149,8 @@ export default function LiveSnippetPreview() {
       <div
         ref={host}
         aria-hidden="true"
-        className="h-[22rem] overflow-hidden text-[0.82rem] sm:h-[25rem]"
+        className="h-[min(22rem,45dvh)] overflow-hidden text-[0.82rem] sm:h-[min(25rem,48dvh)]"
       />
-    </div>
+    </SpotlightCard>
   );
 }

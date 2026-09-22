@@ -2,7 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useMotionValueEvent } from 'motion/react';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+  useReducedMotion,
+} from 'motion/react';
 import { Menu, X } from 'lucide-react';
 import Wordmark from './Wordmark';
 
@@ -17,6 +23,7 @@ export default function SiteNav() {
   const [open, setOpen] = useState(false);
   const [lifted, setLifted] = useState(false);
   const { scrollY } = useScroll();
+  const reduce = useReducedMotion();
 
   // Motion value subscription, so the scroll position never enters React state
   // on every frame. Only the boolean crossing re-renders.
@@ -56,24 +63,51 @@ export default function SiteNav() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className="hidden rounded-full bg-brand-solid px-4 py-2 text-[0.86rem] font-medium text-white transition-all hover:bg-brand-solid-hover active:translate-y-px sm:block"
+            <motion.div
+              whileHover={reduce ? undefined : { y: -2 }}
+              whileTap={reduce ? undefined : { scale: 0.94 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+              className="hidden sm:block"
             >
-              Open editor
-            </Link>
+              <Link
+                href="/"
+                className="block rounded-full bg-brand-solid px-4 py-2 text-[0.86rem] font-medium text-white transition-colors hover:bg-brand-solid-hover"
+              >
+                Open editor
+              </Link>
+            </motion.div>
             <button
               onClick={() => setOpen((v) => !v)}
-              className="rounded-full border border-white/10 bg-white/5 p-2 text-text-hi transition-colors hover:bg-white/10 md:hidden"
+              className="relative grid h-8 w-8 place-items-center overflow-hidden rounded-full border border-white/10 bg-white/5 text-text-hi transition-colors hover:bg-white/10 md:hidden"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? 'Close menu' : 'Open menu'}
             >
-              {open ? (
-                <X className="h-4 w-4" strokeWidth={1.75} />
-              ) : (
-                <Menu className="h-4 w-4" strokeWidth={1.75} />
-              )}
+              <AnimatePresence mode="wait" initial={false}>
+                {open ? (
+                  <motion.span
+                    key="close"
+                    initial={reduce ? false : { opacity: 0, rotate: -45 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={reduce ? undefined : { opacity: 0, rotate: 45 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute"
+                  >
+                    <X className="h-4 w-4" strokeWidth={1.75} />
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="menu"
+                    initial={reduce ? false : { opacity: 0, rotate: 45 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={reduce ? undefined : { opacity: 0, rotate: -45 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute"
+                  >
+                    <Menu className="h-4 w-4" strokeWidth={1.75} />
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </div>
         </nav>

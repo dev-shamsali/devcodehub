@@ -1,11 +1,24 @@
+'use client';
+
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
+import SpotlightCard from './SpotlightCard';
 
 export default function ClosingCta() {
+  const reduce = useReducedMotion();
+
   return (
     <section className="edge-top">
       <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-8 lg:py-24">
-        <div className="glass glass-lit relative overflow-hidden px-6 py-16 text-center sm:px-12 lg:py-20">
+        <SpotlightCard
+          as={motion.div}
+          initial={reduce ? false : { opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          className="glass glass-lit overflow-hidden px-6 py-16 text-center sm:px-12 lg:py-20"
+        >
           <div
             aria-hidden="true"
             className="pointer-events-none absolute left-1/2 top-0 h-[28rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/18 blur-[110px]"
@@ -19,18 +32,25 @@ export default function ClosingCta() {
               Open the editor, name a buffer and send the link. That is the
               entire setup.
             </p>
-            <Link
-              href="/"
-              className="group mt-9 inline-flex items-center gap-2 rounded-full bg-brand-solid px-7 py-3.5 text-[0.96rem] font-medium text-white transition-all hover:bg-brand-solid-hover active:translate-y-px"
+            <motion.div
+              whileHover={reduce ? undefined : { y: -2 }}
+              whileTap={reduce ? undefined : { scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+              className="mt-9 inline-block"
             >
-              Open editor
-              <ArrowRight
-                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                strokeWidth={2}
-              />
-            </Link>
+              <Link
+                href="/"
+                className="group inline-flex items-center gap-2 rounded-full bg-brand-solid px-7 py-3.5 text-[0.96rem] font-medium text-white transition-colors hover:bg-brand-solid-hover"
+              >
+                Open editor
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                  strokeWidth={2}
+                />
+              </Link>
+            </motion.div>
           </div>
-        </div>
+        </SpotlightCard>
       </div>
     </section>
   );
