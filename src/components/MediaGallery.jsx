@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { upload, ImageKitAbortError } from '@imagekit/next';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   UploadCloud,
   FileArchive,
+  FileText,
   Copy,
   Check,
   Download,
@@ -18,9 +20,11 @@ import {
   MEDIA_FOLDER,
   ACCEPT_ATTR,
   isZip,
+  isDocument,
   formatBytes,
   rejectReason,
 } from '@/lib/imagekit';
+import { gridItemVariants, gridItemTransition, tapScale } from '@/lib/motion';
 
 /**
  * One share, holding many files.
@@ -255,13 +259,14 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
           </p>
         </div>
 
-        <button
+        <motion.button
+          whileTap={tapScale}
           onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-full bg-brand-solid px-4 py-2 text-[0.82rem] font-medium text-white transition-colors hover:bg-brand-solid-hover active:translate-y-px"
+          className="inline-flex items-center gap-1.5 rounded-full bg-brand-solid px-4 py-2 text-[0.82rem] font-medium text-white transition-colors hover:bg-brand-solid-hover"
         >
           <UploadCloud className="h-4 w-4" strokeWidth={1.75} />
           Add files
-        </button>
+        </motion.button>
 
         <input
           ref={inputRef}
@@ -307,7 +312,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
                 <UploadCloud className="h-5 w-5 text-brand-soft" strokeWidth={1.75} />
               </div>
               <h3 className="font-display text-lg tracking-tight text-text-hi">
-                Drop images or a zip
+                Drop images, a zip, PDF, or Word doc
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-text-mid">
                 Drag files anywhere in this panel, or use Add files. Everyone
@@ -317,134 +322,173 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
           </div>
         ) : (
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {pending.map((item) => (
-              <li
-                key={item.localId}
-                className="relative overflow-hidden rounded-[10px] border border-white/8 bg-white/[0.03] p-3"
-              >
-                <div className="flex h-full min-h-[7rem] flex-col justify-between">
-                  <p className="truncate text-[0.76rem] text-text-mid">{item.name}</p>
-                  {item.error ? (
-                    <p className="text-[0.72rem] leading-snug text-brand-soft">{item.error}</p>
-                  ) : (
-                    <div>
-                      <div className="mb-1.5 flex items-center gap-1.5 text-[0.72rem] text-text-lo">
-                        <Loader2 className="h-3 w-3 animate-spin" strokeWidth={2} />
-                        {item.progress}%
-                      </div>
-                      <div className="h-1 overflow-hidden rounded-full bg-white/10">
-                        <div
-                          className="h-full rounded-full bg-brand transition-[width] duration-200"
-                          style={{ width: `${item.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
-
-            {files.map((file) => {
-              const zip = isZip(file);
-              return (
-                <li
-                  key={file.key}
-                  className="group relative overflow-hidden rounded-[10px] border border-white/8 bg-white/[0.025] transition-colors hover:border-white/16"
+            <AnimatePresence initial={false}>
+              {pending.map((item) => (
+                <motion.li
+                  key={item.localId}
+                  layout
+                  variants={gridItemVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={gridItemTransition}
+                  className="relative overflow-hidden rounded-[10px] border border-white/8 bg-white/[0.03] p-3"
                 >
-                  {zip ? (
-                    <div className="flex aspect-square flex-col items-center justify-center gap-2 p-3">
-                      <FileArchive className="h-8 w-8 text-brand-soft" strokeWidth={1.5} />
-                      <p className="line-clamp-2 break-all text-center text-[0.72rem] text-text-mid">
-                        {file.name}
-                      </p>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setLightbox(file)}
-                      className="block aspect-square w-full"
-                      aria-label={`Open ${file.name}`}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={`${file.url}?tr=w-400,h-400,c-at_max`}
-                        alt={file.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
-                    </button>
-                  )}
-
-                  <div className="flex items-center justify-between gap-1 border-t border-white/8 px-2 py-1.5">
-                    <span className="truncate text-[0.68rem] text-text-lo">
-                      {formatBytes(file.size)}
-                    </span>
-                    <span className="flex shrink-0 items-center gap-0.5">
-                      <button
-                        onClick={() => copyLink(file)}
-                        className="rounded p-1 text-text-lo transition-colors hover:bg-white/10 hover:text-text-hi"
-                        aria-label={`Copy link to ${file.name}`}
-                      >
-                        {copiedId === file.key ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-400" strokeWidth={2} />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" strokeWidth={1.75} />
-                        )}
-                      </button>
-                      <a
-                        href={`/api/media/download?url=${encodeURIComponent(file.url)}&name=${encodeURIComponent(file.name)}`}
-                        download={file.name}
-                        rel="noopener noreferrer"
-                        className="rounded p-1 text-text-lo transition-colors hover:bg-white/10 hover:text-text-hi"
-                        aria-label={`Download ${file.name}`}
-                      >
-                        <Download className="h-3.5 w-3.5" strokeWidth={1.75} />
-                      </a>
-                      <button
-                        onClick={() => removeFile(file)}
-                        className="rounded p-1 text-text-lo transition-colors hover:bg-brand/15 hover:text-brand-soft"
-                        aria-label={`Delete ${file.name}`}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
-                      </button>
-                    </span>
+                  <div className="flex h-full min-h-[7rem] flex-col justify-between">
+                    <p className="truncate text-[0.76rem] text-text-mid">{item.name}</p>
+                    {item.error ? (
+                      <p className="text-[0.72rem] leading-snug text-brand-soft">{item.error}</p>
+                    ) : (
+                      <div>
+                        <div className="mb-1.5 flex items-center gap-1.5 text-[0.72rem] text-text-lo">
+                          <Loader2 className="h-3 w-3 animate-spin" strokeWidth={2} />
+                          {item.progress}%
+                        </div>
+                        <div className="h-1 overflow-hidden rounded-full bg-white/10">
+                          <motion.div
+                            className="h-full rounded-full bg-brand"
+                            animate={{ width: `${item.progress}%` }}
+                            transition={{ duration: 0.25, ease: 'easeOut' }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </li>
-              );
-            })}
+                </motion.li>
+              ))}
+
+              {files.map((file) => {
+                const zip = isZip(file);
+                const doc = isDocument(file);
+                return (
+                  <motion.li
+                    key={file.key}
+                    layout
+                    variants={gridItemVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={gridItemTransition}
+                    className="group relative overflow-hidden rounded-[10px] border border-white/8 bg-white/[0.025] transition-colors hover:border-white/16"
+                  >
+                    {zip || doc ? (
+                      <div className="flex aspect-square flex-col items-center justify-center gap-2 p-3">
+                        {zip ? (
+                          <FileArchive className="h-8 w-8 text-brand-soft" strokeWidth={1.5} />
+                        ) : (
+                          <FileText className="h-8 w-8 text-brand-soft" strokeWidth={1.5} />
+                        )}
+                        <p className="line-clamp-2 break-all text-center text-[0.72rem] text-text-mid">
+                          {file.name}
+                        </p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setLightbox(file)}
+                        className="block aspect-square w-full"
+                        aria-label={`Open ${file.name}`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`${file.url}?tr=w-400,h-400,c-at_max`}
+                          alt={file.name}
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
+                      </button>
+                    )}
+
+                    <div className="flex items-center justify-between gap-1 border-t border-white/8 px-2 py-1.5">
+                      <span className="truncate text-[0.68rem] text-text-lo">
+                        {formatBytes(file.size)}
+                      </span>
+                      <span className="flex shrink-0 items-center gap-0.5">
+                        <motion.button
+                          whileTap={tapScale}
+                          onClick={() => copyLink(file)}
+                          className="rounded p-1 text-text-lo transition-colors hover:bg-white/10 hover:text-text-hi"
+                          aria-label={`Copy link to ${file.name}`}
+                        >
+                          {copiedId === file.key ? (
+                            <Check className="h-3.5 w-3.5 text-emerald-400" strokeWidth={2} />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" strokeWidth={1.75} />
+                          )}
+                        </motion.button>
+                        <a
+                          href={`/api/media/download?url=${encodeURIComponent(file.url)}&name=${encodeURIComponent(file.name)}`}
+                          download={file.name}
+                          rel="noopener noreferrer"
+                          className="rounded p-1 text-text-lo transition-colors hover:bg-white/10 hover:text-text-hi"
+                          aria-label={`Download ${file.name}`}
+                        >
+                          <Download className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        </a>
+                        <motion.button
+                          whileTap={tapScale}
+                          onClick={() => removeFile(file)}
+                          className="rounded p-1 text-text-lo transition-colors hover:bg-brand/15 hover:text-brand-soft"
+                          aria-label={`Delete ${file.name}`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        </motion.button>
+                      </span>
+                    </div>
+                  </motion.li>
+                );
+              })}
+            </AnimatePresence>
           </ul>
         )}
       </div>
 
-      {dragging && (
-        <div className="pointer-events-none absolute inset-2 z-40 flex items-center justify-center rounded-[12px] border-2 border-dashed border-brand/60 bg-ink-900/80 backdrop-blur-sm">
-          <p className="font-display text-lg text-text-hi">Drop to upload</p>
-        </div>
-      )}
-
-      {lightbox && (
-        <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-ink-900/90 p-4 backdrop-blur-sm"
-          onClick={() => setLightbox(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label={lightbox.name}
-        >
-          <button
-            onClick={() => setLightbox(null)}
-            className="absolute right-4 top-4 rounded-full border border-white/12 bg-white/5 p-2 text-text-hi transition-colors hover:bg-white/10"
-            aria-label="Close"
+      <AnimatePresence>
+        {dragging && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12 }}
+            className="pointer-events-none absolute inset-2 z-40 flex items-center justify-center rounded-[12px] border-2 border-dashed border-brand/60 bg-ink-900/80 backdrop-blur-sm"
           >
-            <X className="h-4 w-4" strokeWidth={1.75} />
-          </button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`${lightbox.url}?tr=w-1600,c-at_max`}
-            alt={lightbox.name}
-            onClick={(e) => e.stopPropagation()}
-            className="max-h-full max-w-full rounded-[10px] object-contain"
-          />
-        </div>
-      )}
+            <p className="font-display text-lg text-text-hi">Drop to upload</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {lightbox && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-ink-900/90 p-4 backdrop-blur-sm"
+            onClick={() => setLightbox(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={lightbox.name}
+          >
+            <button
+              onClick={() => setLightbox(null)}
+              className="absolute right-4 top-4 rounded-full border border-white/12 bg-white/5 p-2 text-text-hi transition-colors hover:bg-white/10"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+            <motion.img
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              src={`${lightbox.url}?tr=w-1600,c-at_max`}
+              alt={lightbox.name}
+              onClick={(e) => e.stopPropagation()}
+              className="max-h-full max-w-full rounded-[10px] object-contain"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useRef, useState, Fragment } from 'react';
 import { database } from '../lib/firebase';
 import { ref, onValue, set, update, child } from 'firebase/database';
 import {
@@ -14,6 +14,13 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, Transition } from '@headlessui/react';
+import {
+  sideDropdownVariants,
+  dropdownTransition,
+  listItemVariants,
+  listItemTransition,
+  tapScale,
+} from '@/lib/motion';
 
 const THIRTY_SIX_HOURS_MS = 36 * 60 * 60 * 1000;
 
@@ -25,7 +32,46 @@ export default function NoteList({ onSelect, onDelete }) {
   const [error, setError] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [menuPos, setMenuPos] = useState(null);
+  const menuButtonRefs = useRef({});
   const [selectedIds, setSelectedIds] = useState(new Set());
+
+  // The list scrolls (overflow-y-auto), which forces overflow-x to clip too
+  // (a CSS quirk: setting one axis to non-visible forces the other to auto).
+  // Fixed positioning off the trigger's own rect escapes that clip instead of
+  // fighting it, and the menu simply closes if the list scrolls under it.
+  const toggleDropdown = (noteId) => {
+    if (dropdownOpen === noteId) {
+      setDropdownOpen(null);
+      setMenuPos(null);
+      return;
+    }
+    const btn = menuButtonRefs.current[noteId];
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      const width = 160;
+      const overflowsRight = rect.right + 4 + width > window.innerWidth;
+      setMenuPos({
+        top: rect.top,
+        left: overflowsRight ? rect.left - width - 4 : rect.right + 4,
+      });
+    }
+    setDropdownOpen(noteId);
+  };
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const close = () => {
+      setDropdownOpen(null);
+      setMenuPos(null);
+    };
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => {
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
+    };
+  }, [dropdownOpen]);
 
   // PIN modal state
   const [pinModal, setPinModal] = useState({
@@ -478,43 +524,48 @@ export default function NoteList({ onSelect, onDelete }) {
               placeholder="New code name..."
               className="flex-1 rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
             />
-            <button
+            <motion.button
+              whileTap={tapScale}
               onClick={createNote}
               disabled={!newNoteName.trim() || isCreating}
               className="px-4 py-2 rounded-lg bg-brand-solid text-white text-sm font-medium hover:bg-brand-solid-hover disabled:bg-white/[0.10] disabled:text-text-lo"
             >
               {isCreating ? '...' : 'Add'}
-            </button>
+            </motion.button>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-mid">
             <span>Selected: {selectedIds.size}</span>
-            <button
+            <motion.button
+              whileTap={tapScale}
               onClick={selectAll}
               className="px-2 py-1 rounded bg-white/[0.06] hover:bg-white/[0.10]"
             >
               Select all
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileTap={tapScale}
               onClick={clearSelection}
               className="px-2 py-1 rounded bg-white/[0.06] hover:bg-white/[0.10]"
             >
               Clear
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileTap={tapScale}
               onClick={deleteSelected}
               disabled={!selectedIds.size}
               className="px-2 py-1 rounded bg-brand/10 text-brand-soft hover:bg-brand/15 disabled:opacity-40"
             >
               Delete selected
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileTap={tapScale}
               onClick={openMasterDeleteModal}
               disabled={!notes.length}
               className="px-3 py-1.5 rounded bg-brand-solid text-white text-xs font-semibold hover:bg-brand-solid-hover disabled:opacity-40"
             >
               Delete all
-            </button>
+            </motion.button>
           </div>
         </div>
 
@@ -529,145 +580,159 @@ export default function NoteList({ onSelect, onDelete }) {
               No codes found.
             </div>
           ) : (
-            filtered.map((note) => (
-              <motion.div
-                key={note.id}
-                layout
-                className="flex items-center justify-between rounded-[10px] border border-white/8 bg-white/[0.025] px-3 py-2 transition-colors hover:border-white/14 hover:bg-white/[0.06]"
-              >
-                {/* Checkbox */}
-                <input
-                  type="checkbox"
-                  checked={selectedIds.has(note.id)}
-                  onChange={() => toggleSelect(note.id)}
-                  className="accent-blue-600 mr-2"
-                />
-
-                {/* Note info */}
-                <div
-                  className={`flex-1 cursor-pointer ${
-                    note.locked ? 'opacity-70' : ''
-                  }`}
-                  onClick={() =>
-                    note.locked
-                      ? openLockedNoteModal(note)
-                      : onSelect?.(note.id, note.name)
-                  }
+            <AnimatePresence initial={false}>
+              {filtered.map((note) => (
+                <motion.div
+                  key={note.id}
+                  layout
+                  variants={listItemVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={listItemTransition}
+                  className="flex items-center justify-between rounded-[10px] border border-white/8 bg-white/[0.025] px-3 py-2 transition-colors hover:border-white/14 hover:bg-white/[0.06]"
                 >
-                  <div className="flex items-center gap-2 text-sm font-medium text-text-hi">
-                    <span className="truncate">{note.name}</span>
-                    {note.pinned && (
-                      <Pin className="w-4 h-4 text-brand-soft" />
-                    )}
-                    {note.locked && (
-                      <Lock className="w-4 h-4 text-text-mid" />
-                    )}
-                  </div>
-                  <p className="text-[10px] text-text-lo">
-                    Modified {formatDate(note.lastModified)}
-                  </p>
-                </div>
+                  {/* Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(note.id)}
+                    onChange={() => toggleSelect(note.id)}
+                    className="accent-blue-600 mr-2"
+                  />
 
-                {/* Dropdown */}
-                <div className="relative ml-2">
-                  <button
+                  {/* Note info */}
+                  <div
+                    className={`flex-1 cursor-pointer ${
+                      note.locked ? 'opacity-70' : ''
+                    }`}
                     onClick={() =>
-                      setDropdownOpen(
-                        dropdownOpen === note.id ? null : note.id
-                      )
+                      note.locked
+                        ? openLockedNoteModal(note)
+                        : onSelect?.(note.id, note.name)
                     }
-                    className="p-1.5 rounded-md hover:bg-white/[0.06]"
                   >
-                    <MoreVertical className="w-4 h-4 text-text-mid" />
-                  </button>
+                    <div className="flex items-center gap-2 text-sm font-medium text-text-hi">
+                      <span className="truncate">{note.name}</span>
+                      {note.pinned && (
+                        <Pin className="w-4 h-4 text-brand-soft" />
+                      )}
+                      {note.locked && (
+                        <Lock className="w-4 h-4 text-text-mid" />
+                      )}
+                    </div>
+                    <p className="text-[10px] text-text-lo">
+                      Modified {formatDate(note.lastModified)}
+                    </p>
+                  </div>
 
-                  <AnimatePresence>
-                    {dropdownOpen === note.id && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -6 }}
-                        transition={{ duration: 0.15 }}
-                        className="glass absolute right-0 top-full mt-1 w-40 z-50 overflow-hidden text-text-hi"
-                      >
-                        <button
-                          onClick={() => {
-                            handleTogglePin(note);
-                            setDropdownOpen(null);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
+                  {/* Dropdown */}
+                  <div className="relative ml-2">
+                    <motion.button
+                      ref={(el) => {
+                        menuButtonRefs.current[note.id] = el;
+                      }}
+                      whileTap={tapScale}
+                      onClick={() => toggleDropdown(note.id)}
+                      className="p-1.5 rounded-md hover:bg-white/[0.06]"
+                    >
+                      <MoreVertical className="w-4 h-4 text-text-mid" />
+                    </motion.button>
+
+                    <AnimatePresence>
+                      {dropdownOpen === note.id && menuPos && (
+                        <motion.div
+                          variants={sideDropdownVariants}
+                          initial="initial"
+                          animate="animate"
+                          exit="exit"
+                          transition={dropdownTransition}
+                          style={{ position: 'fixed', top: menuPos.top, left: menuPos.left }}
+                          className="glass w-40 z-50 overflow-hidden text-text-hi"
                         >
-                          {note.pinned ? (
-                            <PinOff className="w-4 h-4" />
+                          <motion.button
+                            whileHover={{ x: 2 }}
+                            onClick={() => {
+                              handleTogglePin(note);
+                              setDropdownOpen(null);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
+                          >
+                            {note.pinned ? (
+                              <PinOff className="w-4 h-4" />
+                            ) : (
+                              <Pin className="w-4 h-4" />
+                            )}
+                            {note.pinned ? 'Unpin' : 'Pin'}
+                          </motion.button>
+
+                          {note.locked ? (
+                            <motion.button
+                              whileHover={{ x: 2 }}
+                              onClick={() => {
+                                openUnlockModal(note);
+                                setDropdownOpen(null);
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
+                            >
+                              <Unlock className="w-4 h-4" />
+                              Unlock
+                            </motion.button>
                           ) : (
-                            <Pin className="w-4 h-4" />
+                            <motion.button
+                              whileHover={{ x: 2 }}
+                              onClick={() => {
+                                openSetLockModal(note);
+                                setDropdownOpen(null);
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
+                            >
+                              <Lock className="w-4 h-4" />
+                              Lock with PIN
+                            </motion.button>
                           )}
-                          {note.pinned ? 'Unpin' : 'Pin'}
-                        </button>
 
-                        {note.locked ? (
-                          <button
+                          <motion.button
+                            whileHover={{ x: 2 }}
                             onClick={() => {
-                              openUnlockModal(note);
-                              setDropdownOpen(null);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
-                          >
-                            <Unlock className="w-4 h-4" />
-                            Unlock
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              openSetLockModal(note);
-                              setDropdownOpen(null);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
-                          >
-                            <Lock className="w-4 h-4" />
-                            Lock with PIN
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => {
-                            const newName = window.prompt(
-                              'Rename code:',
-                              note.name
-                            );
-                            // leaving a single prompt for rename is acceptable;
-                            // if you want this also modal-based, I can convert too.
-                            if (newName && newName.trim()) {
-                              update(
-                                ref(database, `notes/${note.id}`),
-                                {
-                                  name: newName.trim(),
-                                  lastModified: Date.now(),
-                                }
+                              const newName = window.prompt(
+                                'Rename code:',
+                                note.name
                               );
-                            }
-                            setDropdownOpen(null);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
-                        >
-                          ✏️ Rename
-                        </button>
+                              // leaving a single prompt for rename is acceptable;
+                              // if you want this also modal-based, I can convert too.
+                              if (newName && newName.trim()) {
+                                update(
+                                  ref(database, `notes/${note.id}`),
+                                  {
+                                    name: newName.trim(),
+                                    lastModified: Date.now(),
+                                  }
+                                );
+                              }
+                              setDropdownOpen(null);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/[0.06]"
+                          >
+                            ✏️ Rename
+                          </motion.button>
 
-                        <button
-                          onClick={() => {
-                            openDeleteLockedModal(note);
-                            setDropdownOpen(null);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-brand-soft hover:bg-brand/10"
-                        >
-                          🗑️ Delete
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </motion.div>
-            ))
+                          <motion.button
+                            whileHover={{ x: 2 }}
+                            onClick={() => {
+                              openDeleteLockedModal(note);
+                              setDropdownOpen(null);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-brand-soft hover:bg-brand/10"
+                          >
+                            🗑️ Delete
+                          </motion.button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           )}
         </div>
 
@@ -689,7 +754,7 @@ export default function NoteList({ onSelect, onDelete }) {
         >
           <Transition.Child
             as={Fragment}
-            enter="ease-out duration-150"
+            enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
             enterFrom="opacity-0"
             enterTo="opacity-100"
             leave="ease-in duration-100"
@@ -702,7 +767,7 @@ export default function NoteList({ onSelect, onDelete }) {
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-150"
+              enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
               leave="ease-in duration-100"
@@ -746,13 +811,13 @@ export default function NoteList({ onSelect, onDelete }) {
                         noteId: null,
                       })
                     }
-                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10]"
+                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10] active:scale-95 transition-transform duration-100"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handlePinModalConfirm}
-                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover"
+                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover active:scale-95 transition-transform duration-100"
                   >
                     Confirm
                   </button>
@@ -774,7 +839,7 @@ export default function NoteList({ onSelect, onDelete }) {
         >
           <Transition.Child
             as={Fragment}
-            enter="ease-out duration-150"
+            enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
             enterFrom="opacity-0"
             enterTo="opacity-100"
             leave="ease-in duration-100"
@@ -786,7 +851,7 @@ export default function NoteList({ onSelect, onDelete }) {
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-150"
+              enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
               leave="ease-in duration-100"
@@ -809,7 +874,7 @@ export default function NoteList({ onSelect, onDelete }) {
                         onConfirm: null,
                       })
                     }
-                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10]"
+                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10] active:scale-95 transition-transform duration-100"
                   >
                     Cancel
                   </button>
@@ -822,7 +887,7 @@ export default function NoteList({ onSelect, onDelete }) {
                         onConfirm: null,
                       });
                     }}
-                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover"
+                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover active:scale-95 transition-transform duration-100"
                   >
                     Yes
                   </button>
@@ -842,7 +907,7 @@ export default function NoteList({ onSelect, onDelete }) {
         >
           <Transition.Child
             as={Fragment}
-            enter="ease-out duration-150"
+            enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
             enterFrom="opacity-0"
             enterTo="opacity-100"
             leave="ease-in duration-100"
@@ -854,7 +919,7 @@ export default function NoteList({ onSelect, onDelete }) {
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-150"
+              enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
               leave="ease-in duration-100"
@@ -887,14 +952,14 @@ export default function NoteList({ onSelect, onDelete }) {
                 <div className="mt-3 flex justify-end gap-2">
                   <button
                     onClick={() => setMasterModalOpen(false)}
-                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10]"
+                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10] active:scale-95 transition-transform duration-100"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={confirmMasterDelete}
                     disabled={masterChecking}
-                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover disabled:opacity-60"
+                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover disabled:opacity-60 active:scale-95 transition-transform duration-100"
                   >
                     {masterChecking ? 'Checking...' : 'Delete all'}
                   </button>

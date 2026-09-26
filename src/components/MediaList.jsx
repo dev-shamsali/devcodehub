@@ -1,8 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useState, Fragment } from 'react';
+import { useCallback, useEffect, useRef, useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Search, Images, Pin, PinOff, Trash2, MoreVertical } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  sideDropdownVariants,
+  dropdownTransition,
+  listItemVariants,
+  listItemTransition,
+  tapScale,
+} from '@/lib/motion';
 
 /**
  * Sidebar list of media shares, backed by MongoDB through /api/media/shares.
@@ -22,7 +30,46 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState('');
   const [menuOpen, setMenuOpen] = useState(null);
+  const [menuPos, setMenuPos] = useState(null);
+  const menuButtonRefs = useRef({});
   const [confirm, setConfirm] = useState({ open: false, share: null });
+
+  // Same fixed-position trick as NoteList: the list scrolls (overflow-y-auto),
+  // which forces overflow-x to clip too, so a menu anchored with absolute
+  // right-of-button would get cut off. Fixed positioning off the trigger's
+  // own rect escapes that clip; the menu just closes if the list scrolls.
+  const toggleMenu = (shareId) => {
+    if (menuOpen === shareId) {
+      setMenuOpen(null);
+      setMenuPos(null);
+      return;
+    }
+    const btn = menuButtonRefs.current[shareId];
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      const width = 160;
+      const overflowsRight = rect.right + 4 + width > window.innerWidth;
+      setMenuPos({
+        top: rect.top,
+        left: overflowsRight ? rect.left - width - 4 : rect.right + 4,
+      });
+    }
+    setMenuOpen(shareId);
+  };
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = () => {
+      setMenuOpen(null);
+      setMenuPos(null);
+    };
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => {
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
+    };
+  }, [menuOpen]);
   const [now, setNow] = useState(() => Date.now());
 
   // Pure fetch. Keeping the state writes out of here lets the effect below
@@ -188,13 +235,14 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
               placeholder="New share name..."
               className="flex-1 rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi outline-none placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30"
             />
-            <button
+            <motion.button
+              whileTap={tapScale}
               onClick={createShare}
               disabled={!newName.trim() || isCreating}
               className="rounded-[10px] bg-brand-solid px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-solid-hover disabled:bg-white/[0.10] disabled:text-text-lo"
             >
               {isCreating ? '...' : 'Add'}
-            </button>
+            </motion.button>
           </div>
           {error && <p className="mt-2 text-[11px] text-brand-soft">{error}</p>}
         </div>
@@ -216,75 +264,99 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
                 : 'No shares match that search.'}
             </p>
           ) : (
-            filtered.map((share) => {
-              const active = share.id === selectedId;
-              return (
-                <div
-                  key={share.id}
-                  className={`relative flex items-center gap-2 rounded-[10px] border px-3 py-2 transition-colors ${
-                    active
-                      ? 'border-brand/40 bg-brand/10'
-                      : 'border-white/8 bg-white/[0.025] hover:border-white/14 hover:bg-white/[0.06]'
-                  }`}
-                >
-                  <button
-                    onClick={() => onSelect(share.id, share.name)}
-                    className="min-w-0 flex-1 text-left"
+            <AnimatePresence initial={false}>
+              {filtered.map((share) => {
+                const active = share.id === selectedId;
+                return (
+                  <motion.div
+                    key={share.id}
+                    layout
+                    variants={listItemVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={listItemTransition}
+                    className={`relative flex items-center gap-2 rounded-[10px] border px-3 py-2 transition-colors ${
+                      active
+                        ? 'border-brand/40 bg-brand/10'
+                        : 'border-white/8 bg-white/[0.025] hover:border-white/14 hover:bg-white/[0.06]'
+                    }`}
                   >
-                    <span className="flex items-center gap-1.5">
-                      {share.pinned && (
-                        <Pin className="h-3 w-3 shrink-0 text-brand" strokeWidth={2} />
-                      )}
-                      <span className="truncate text-sm font-medium text-text-hi">
-                        {share.name}
-                      </span>
-                    </span>
-                    <span className="mt-0.5 block text-[11px] text-text-lo">
-                      {share.fileCount} {share.fileCount === 1 ? 'file' : 'files'}
-                      {' · '}
-                      {formatDate(share.updatedAt)}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setMenuOpen(menuOpen === share.id ? null : share.id)}
-                    className="rounded-md p-1.5 text-text-mid transition-colors hover:bg-white/[0.08] hover:text-text-hi"
-                    aria-label={`Actions for ${share.name}`}
-                    aria-expanded={menuOpen === share.id}
-                  >
-                    <MoreVertical className="h-4 w-4" strokeWidth={1.75} />
-                  </button>
-
-                  {menuOpen === share.id && (
-                    <div className="glass absolute right-0 top-full z-50 mt-1 w-40 overflow-hidden">
-                      <button
-                        onClick={() => togglePin(share)}
-                        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-text-hi transition-colors hover:bg-white/[0.06]"
-                      >
-                        {share.pinned ? (
-                          <>
-                            <PinOff className="h-3.5 w-3.5" strokeWidth={1.75} /> Unpin
-                          </>
-                        ) : (
-                          <>
-                            <Pin className="h-3.5 w-3.5" strokeWidth={1.75} /> Pin
-                          </>
+                    <button
+                      onClick={() => onSelect(share.id, share.name)}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        {share.pinned && (
+                          <Pin className="h-3 w-3 shrink-0 text-brand" strokeWidth={2} />
                         )}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setConfirm({ open: true, share });
-                          setMenuOpen(null);
-                        }}
-                        className="flex w-full items-center gap-2 px-3 py-2 text-xs text-brand-soft transition-colors hover:bg-brand/10"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} /> Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })
+                        <span className="truncate text-sm font-medium text-text-hi">
+                          {share.name}
+                        </span>
+                      </span>
+                      <span className="mt-0.5 block text-[11px] text-text-lo">
+                        {share.fileCount} {share.fileCount === 1 ? 'file' : 'files'}
+                        {' · '}
+                        {formatDate(share.updatedAt)}
+                      </span>
+                    </button>
+
+                    <motion.button
+                      ref={(el) => {
+                        menuButtonRefs.current[share.id] = el;
+                      }}
+                      whileTap={tapScale}
+                      onClick={() => toggleMenu(share.id)}
+                      className="rounded-md p-1.5 text-text-mid transition-colors hover:bg-white/[0.08] hover:text-text-hi"
+                      aria-label={`Actions for ${share.name}`}
+                      aria-expanded={menuOpen === share.id}
+                    >
+                      <MoreVertical className="h-4 w-4" strokeWidth={1.75} />
+                    </motion.button>
+
+                    <AnimatePresence>
+                      {menuOpen === share.id && menuPos && (
+                        <motion.div
+                          variants={sideDropdownVariants}
+                          initial="initial"
+                          animate="animate"
+                          exit="exit"
+                          transition={dropdownTransition}
+                          style={{ position: 'fixed', top: menuPos.top, left: menuPos.left }}
+                          className="glass w-40 z-50 overflow-hidden"
+                        >
+                          <motion.button
+                            whileHover={{ x: 2 }}
+                            onClick={() => togglePin(share)}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-xs text-text-hi transition-colors hover:bg-white/[0.06]"
+                          >
+                            {share.pinned ? (
+                              <>
+                                <PinOff className="h-3.5 w-3.5" strokeWidth={1.75} /> Unpin
+                              </>
+                            ) : (
+                              <>
+                                <Pin className="h-3.5 w-3.5" strokeWidth={1.75} /> Pin
+                              </>
+                            )}
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ x: 2 }}
+                            onClick={() => {
+                              setConfirm({ open: true, share });
+                              setMenuOpen(null);
+                            }}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-xs text-brand-soft transition-colors hover:bg-brand/10"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} /> Delete
+                          </motion.button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           )}
         </div>
       </div>
@@ -297,7 +369,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
         >
           <Transition.Child
             as={Fragment}
-            enter="ease-out duration-150"
+            enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
             enterFrom="opacity-0"
             enterTo="opacity-100"
             leave="ease-in duration-100"
@@ -310,7 +382,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-150"
+              enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
               leave="ease-in duration-100"

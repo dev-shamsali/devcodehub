@@ -27,9 +27,12 @@ export const ACCEPTED_MIME = [
   'application/zip',
   'application/x-zip-compressed',
   'application/octet-stream',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 
-export const ACCEPT_ATTR = 'image/*,.zip';
+export const ACCEPT_ATTR = 'image/*,.zip,.pdf,.doc,.docx';
 
 // ImageKit rejects anything larger on the standard plan, so catch it in the
 // browser rather than after the bytes have been sent.
@@ -48,6 +51,17 @@ export function isImage(file) {
   return type === 'image' || type.startsWith('image/') || /\.(png|jpe?g|gif|webp|avif|svg)$/i.test(name);
 }
 
+export function isDocument(file) {
+  const type = file?.fileType || file?.type || '';
+  const name = file?.name || '';
+  return (
+    type === 'application/pdf' ||
+    type === 'application/msword' ||
+    type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    /\.(pdf|docx?)$/i.test(name)
+  );
+}
+
 export function formatBytes(bytes) {
   if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
   const units = ['B', 'KB', 'MB', 'GB'];
@@ -63,9 +77,9 @@ export function rejectReason(file) {
   }
   const looksAccepted =
     ACCEPTED_MIME.includes(file.type) ||
-    /\.(png|jpe?g|gif|webp|avif|svg|zip)$/i.test(file.name);
+    /\.(png|jpe?g|gif|webp|avif|svg|zip|pdf|docx?)$/i.test(file.name);
   if (!looksAccepted) {
-    return `${file.name} is not an image or a zip.`;
+    return `${file.name} is not an image, zip, PDF, or Word document.`;
   }
   return null;
 }
