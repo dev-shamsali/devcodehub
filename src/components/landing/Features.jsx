@@ -80,12 +80,12 @@ export default function Features() {
                   delay: Math.min(i * 0.07, 0.28),
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className={`glass liquid liquid-card p-6 sm:p-7 ${feature.span} ${
+                className={`glass glass-hover p-6 sm:p-7 ${feature.span} ${
                   lit ? 'glass-lit md:p-9' : ''
                 } ${tint ? 'bg-gradient-to-br from-brand/25 to-transparent' : ''}`}
               >
                 <div className="relative flex h-full flex-col">
-                  <span className="liquid liquid-icon mb-6">
+                  <span className="icon-chip mb-6">
                     <Icon className="h-5 w-5" strokeWidth={1.75} />
                   </span>
 

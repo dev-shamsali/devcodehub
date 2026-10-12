@@ -1,3 +1,5 @@
+import { containsProfanity } from '@/lib/profanity';
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export const PASSWORD_MIN = 8;
@@ -31,6 +33,7 @@ export function validateName(name) {
   if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 80) {
     return 'Enter your name (2 to 80 characters).';
   }
+  if (containsProfanity(name)) return 'Please use your real name. Abusive words are not allowed.';
   return null;
 }
 

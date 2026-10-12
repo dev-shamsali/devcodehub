@@ -100,7 +100,7 @@ export default function EditorWorkspace({ user }) {
           ) : (
             <div className="glass flex h-full min-h-[24rem] items-center justify-center p-8">
               <div className="max-w-sm text-center">
-                <div className="liquid liquid-icon mx-auto mb-5 !h-14 !w-14">
+                <div className="icon-chip mx-auto mb-5 !h-14 !w-14">
                   <FileCode2 className="h-6 w-6" strokeWidth={1.75} />
                 </div>
                 <h2 className="font-display text-xl tracking-tight text-text-hi">

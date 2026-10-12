@@ -262,7 +262,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
         <motion.button
           whileTap={tapScale}
           onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-full btn-liquid px-4 py-2 text-[0.82rem] font-medium text-white transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-full btn-primary px-4 py-2 text-[0.82rem] font-medium text-white transition-colors"
         >
           <UploadCloud className="h-4 w-4" strokeWidth={1.75} />
           Add files
@@ -308,7 +308,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
         ) : files.length === 0 && pending.length === 0 ? (
           <div className="flex h-full min-h-[18rem] items-center justify-center">
             <div className="max-w-sm text-center">
-              <div className="liquid liquid-icon mx-auto mb-5 !h-14 !w-14">
+              <div className="icon-chip mx-auto mb-5 !h-14 !w-14">
                 <UploadCloud className="h-6 w-6" strokeWidth={1.75} />
               </div>
               <h3 className="font-display text-lg tracking-tight text-text-hi">

@@ -40,7 +40,7 @@ export default function ClosingCta() {
             >
               <Link
                 href="/signup"
-                className="group inline-flex items-center gap-2 btn-liquid rounded-full px-7 py-3.5 text-[0.96rem] font-medium text-white transition-colors"
+                className="group inline-flex items-center gap-2 btn-primary rounded-full px-7 py-3.5 text-[0.96rem] font-medium text-white transition-colors"
               >
                 Get started
                 <ArrowRight

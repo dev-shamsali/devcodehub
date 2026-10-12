@@ -89,9 +89,9 @@ export default function MediaPitch() {
               <motion.li
                 key={point.title}
                 {...rise(Math.min(i * 0.07, 0.24))}
-                className="glass liquid liquid-card p-6"
+                className="glass glass-hover p-6"
               >
-                <span className="liquid liquid-icon mb-5">
+                <span className="icon-chip mb-5">
                   <Icon className="h-5 w-5" strokeWidth={1.75} />
                 </span>
                 <h2 className="font-display text-lg font-semibold tracking-tight text-text-hi">

@@ -120,7 +120,7 @@ export default function MediaWorkspace() {
           ) : (
             <div className="glass flex h-full min-h-[24rem] items-center justify-center p-8">
               <div className="max-w-sm text-center">
-                <div className="liquid liquid-icon mx-auto mb-5 !h-14 !w-14">
+                <div className="icon-chip mx-auto mb-5 !h-14 !w-14">
                   <Images className="h-6 w-6" strokeWidth={1.75} />
                 </div>
                 <h2 className="font-display text-xl tracking-tight text-text-hi">
@@ -132,7 +132,7 @@ export default function MediaWorkspace() {
                 </p>
                 <button
                   onClick={() => setIsSidebarOpen(true)}
-                  className="mt-5 rounded-full btn-liquid px-5 py-2 text-sm font-medium text-white transition-colors active:scale-[0.98] md:hidden"
+                  className="mt-5 rounded-full btn-primary px-5 py-2 text-sm font-medium text-white transition-colors active:scale-[0.98] md:hidden"
                 >
                   Browse shares
                 </button>

@@ -43,6 +43,18 @@ export default function SiteFooter() {
             Home
           </Link>
           <Link
+            href="/privacy"
+            className="text-[0.86rem] text-text-mid transition-colors hover:text-text-hi"
+          >
+            Privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="text-[0.86rem] text-text-mid transition-colors hover:text-text-hi"
+          >
+            Terms
+          </Link>
+          <Link
             href="/media"
             className="text-[0.86rem] text-text-mid transition-colors hover:text-text-hi"
           >

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/auth/guard';
+import { containsProfanity, PROFANITY_MESSAGE } from '@/lib/profanity';
 import { getShares, isConfigured, describeDbError } from '@/lib/mongodb';
 
 export const runtime = 'nodejs';
@@ -73,6 +74,9 @@ export async function POST(request) {
 
   if (typeof name !== 'string' || !name.trim()) {
     return NextResponse.json({ ok: false, error: 'A name is required.' }, { status: 400 });
+  }
+  if (containsProfanity(name)) {
+    return NextResponse.json({ ok: false, error: PROFANITY_MESSAGE }, { status: 400 });
   }
 
   try {

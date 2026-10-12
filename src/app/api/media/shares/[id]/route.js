@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/auth/guard';
+import { containsProfanity, PROFANITY_MESSAGE } from '@/lib/profanity';
 import { getShares, isConfigured, describeDbError } from '@/lib/mongodb';
 
 export const runtime = 'nodejs';
@@ -75,6 +76,9 @@ export async function PATCH(request, { params }) {
 
   const set = { updatedAt: new Date() };
   if (typeof body.pinned === 'boolean') set.pinned = body.pinned;
+  if (typeof body.name === 'string' && containsProfanity(body.name)) {
+    return NextResponse.json({ ok: false, error: PROFANITY_MESSAGE }, { status: 400 });
+  }
   if (typeof body.name === 'string' && body.name.trim()) set.name = body.name.trim().slice(0, 120);
 
   try {

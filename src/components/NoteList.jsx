@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, Fragment } from 'react';
 import { database } from '../lib/firebase';
+import { containsProfanity, maskProfanity, PROFANITY_MESSAGE } from '@/lib/profanity';
 import { ref, onValue, set, update, child } from 'firebase/database';
 import {
   Search,
@@ -221,6 +222,10 @@ export default function NoteList({ onSelect, onDelete, user }) {
     const trimmed = newNoteName.trim();
     if (!trimmed) {
       setError('Please enter a code name');
+      return;
+    }
+    if (containsProfanity(trimmed)) {
+      setError(PROFANITY_MESSAGE);
       return;
     }
     if (
@@ -542,7 +547,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
               whileTap={tapScale}
               onClick={createNote}
               disabled={!newNoteName.trim() || isCreating}
-              className="px-4 py-2 rounded-full btn-liquid text-white text-sm font-medium disabled:opacity-50"
+              className="px-4 py-2 rounded-full btn-primary text-white text-sm font-medium disabled:opacity-50"
             >
               {isCreating ? '...' : 'Add'}
             </motion.button>
@@ -626,7 +631,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                     }
                   >
                     <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-text-hi">
-                      <span className="truncate">{note.name}</span>
+                      <span className="truncate">{maskProfanity(note.name)}</span>
                       {note.pinned && (
                         <Pin className="h-4 w-4 shrink-0 text-brand-soft" />
                       )}
@@ -722,7 +727,9 @@ export default function NoteList({ onSelect, onDelete, user }) {
                               );
                               // leaving a single prompt for rename is acceptable;
                               // if you want this also modal-based, I can convert too.
-                              if (newName && newName.trim()) {
+                              if (newName && containsProfanity(newName)) {
+                                window.alert(PROFANITY_MESSAGE);
+                              } else if (newName && newName.trim()) {
                                 update(
                                   ref(database, `notes/${note.id}`),
                                   {
@@ -841,7 +848,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                   </button>
                   <button
                     onClick={handlePinModalConfirm}
-                    className="px-3 py-1 text-xs rounded-full btn-liquid text-white active:scale-95 transition-transform duration-100"
+                    className="px-3 py-1 text-xs rounded-full btn-primary text-white active:scale-95 transition-transform duration-100"
                   >
                     Confirm
                   </button>
@@ -911,7 +918,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                         onConfirm: null,
                       });
                     }}
-                    className="px-3 py-1 text-xs rounded-full btn-liquid text-white active:scale-95 transition-transform duration-100"
+                    className="px-3 py-1 text-xs rounded-full btn-primary text-white active:scale-95 transition-transform duration-100"
                   >
                     Yes
                   </button>
@@ -983,7 +990,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                   <button
                     onClick={confirmMasterDelete}
                     disabled={masterChecking}
-                    className="px-3 py-1 text-xs rounded-full btn-liquid text-white disabled:opacity-60 active:scale-95 transition-transform duration-100"
+                    className="px-3 py-1 text-xs rounded-full btn-primary text-white disabled:opacity-60 active:scale-95 transition-transform duration-100"
                   >
                     {masterChecking ? 'Checking...' : 'Delete all'}
                   </button>

@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, Images, FileArchive, Code2 } from 'lucide-react';
 
 /**
- * Chips orbiting the emblem. Each is a glass tile with its own liquid fill,
+ * Chips orbiting the emblem. Each is a glass tile with its own fill,
  * and floats on a slow spring so the hero is alive without being busy.
  */
 const CHIPS = [
@@ -56,7 +56,7 @@ export default function Hero() {
             >
               <Link
                 href="/signup"
-                className="group inline-flex items-center gap-2 btn-liquid rounded-full px-6 py-3 text-[0.94rem] font-medium text-white"
+                className="group inline-flex items-center gap-2 btn-primary rounded-full px-6 py-3 text-[0.94rem] font-medium text-white"
               >
                 Get started
                 <ArrowRight
@@ -88,7 +88,7 @@ export default function Hero() {
             className="pointer-events-none absolute inset-[8%] rounded-full bg-brand/25 blur-[90px]"
           />
 
-          <div className="glass glass-lit liquid liquid-card !absolute inset-[10%] grid place-items-center overflow-hidden p-8">
+          <div className="glass glass-lit glass-hover !absolute inset-[10%] grid place-items-center overflow-hidden p-8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo-mark.png"
@@ -104,9 +104,9 @@ export default function Hero() {
               key={label}
               animate={reduce ? undefined : { y: [0, -8, 0] }}
               transition={{ duration: 5.5, delay, repeat: Infinity, ease: 'easeInOut' }}
-              className={`glass-pill liquid-card group absolute hidden items-center gap-3 py-2 pl-2 pr-5 sm:flex ${className}`}
+              className={`glass-pill glass-hover group absolute hidden items-center gap-3 py-2 pl-2 pr-5 sm:flex ${className}`}
             >
-              <span className="liquid liquid-icon !h-10 !w-10">
+              <span className="icon-chip !h-10 !w-10">
                 <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
               </span>
               <span className="text-[0.84rem] font-medium text-text-hi">{label}</span>

@@ -89,14 +89,14 @@ export default function SiteNav({ user = null }) {
               {user ? (
                 <Link
                   href="/editor"
-                  className="block rounded-full btn-liquid px-4 py-2 text-[0.86rem] font-medium text-white transition-colors"
+                  className="block rounded-full btn-primary px-4 py-2 text-[0.86rem] font-medium text-white transition-colors"
                 >
                   Open editor
                 </Link>
               ) : (
                 <Link
                   href="/signup"
-                  className="block rounded-full btn-liquid px-4 py-2 text-[0.86rem] font-medium text-white transition-colors"
+                  className="block rounded-full btn-primary px-4 py-2 text-[0.86rem] font-medium text-white transition-colors"
                 >
                   Create account
                 </Link>
@@ -164,7 +164,7 @@ export default function SiteNav({ user = null }) {
                 <Link
                   href="/editor"
                   onClick={() => setOpen(false)}
-                  className="block rounded-full btn-liquid px-4 py-2.5 text-center text-sm font-medium text-white"
+                  className="block rounded-full btn-primary px-4 py-2.5 text-center text-sm font-medium text-white"
                 >
                   Open editor
                 </Link>
@@ -182,7 +182,7 @@ export default function SiteNav({ user = null }) {
                 <Link
                   href="/signup"
                   onClick={() => setOpen(false)}
-                  className="block rounded-full btn-liquid px-4 py-2.5 text-center text-sm font-medium text-white"
+                  className="block rounded-full btn-primary px-4 py-2.5 text-center text-sm font-medium text-white"
                 >
                   Create account
                 </Link>

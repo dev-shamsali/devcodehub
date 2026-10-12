@@ -65,7 +65,7 @@ export default function Workflow() {
             >
               <span
                 aria-hidden="true"
-                className="liquid mb-6 block h-[18px] w-[18px] rounded-full border-2 border-brand bg-ink-900"
+                className="mb-6 block h-[18px] w-[18px] rounded-full border-2 border-brand bg-ink-900"
               />
               <h3 className="font-display text-xl font-semibold tracking-tight text-text-hi">
                 {move.verb}

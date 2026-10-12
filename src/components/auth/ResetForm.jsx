@@ -14,7 +14,7 @@ export default function ResetForm({ token }) {
         <FormMessage message="Password updated. You can log in with it now." />
         <Link
           href="/login"
-          className="block rounded-full btn-liquid px-4 py-2.5 text-center text-sm font-medium text-white"
+          className="block rounded-full btn-primary px-4 py-2.5 text-center text-sm font-medium text-white"
         >
           Go to login
         </Link>

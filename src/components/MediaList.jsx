@@ -1,5 +1,6 @@
 'use client';
 
+import { maskProfanity } from '@/lib/profanity';
 import { useCallback, useEffect, useRef, useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Search, Images, Pin, PinOff, Trash2, MoreVertical } from 'lucide-react';
@@ -239,7 +240,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
               whileTap={tapScale}
               onClick={createShare}
               disabled={!newName.trim() || isCreating}
-              className="rounded-[12px] btn-liquid px-4 py-2 text-sm font-medium text-white transition-colors disabled:bg-white/[0.10] disabled:text-text-lo"
+              className="rounded-[12px] btn-primary px-4 py-2 text-sm font-medium text-white transition-colors disabled:bg-white/[0.10] disabled:text-text-lo"
             >
               {isCreating ? '...' : 'Add'}
             </motion.button>
@@ -291,7 +292,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
                           <Pin className="h-3 w-3 shrink-0 text-brand" strokeWidth={2} />
                         )}
                         <span className="truncate text-sm font-medium text-text-hi">
-                          {share.name}
+                          {maskProfanity(share.name)}
                         </span>
                       </span>
                       <span className="mt-0.5 block text-[11px] text-text-lo">
@@ -406,7 +407,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
                   </button>
                   <button
                     onClick={deleteShare}
-                    className="rounded btn-liquid px-3 py-1 text-xs text-white transition-colors"
+                    className="rounded btn-primary px-3 py-1 text-xs text-white transition-colors"
                   >
                     Delete
                   </button>
