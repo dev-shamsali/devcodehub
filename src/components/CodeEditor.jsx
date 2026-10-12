@@ -9,6 +9,7 @@ import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
 
 import { Copy, Check, Loader2, Wifi, WifiOff } from 'lucide-react';
 import { AUTHOR } from '@/lib/site';
@@ -28,12 +29,23 @@ export default function CodeEditor({ noteId, user }) {
   const [isSaving, setIsSaving] = useState(false);
   const [lineCount, setLineCount] = useState(1);
   const [charCount, setCharCount] = useState(0);
+  const [dark, setDark] = useState(false);
   const [meta, setMeta] = useState({ createdBy: '', lastEditedBy: '', lastModified: 0 });
   // Read inside the CodeMirror listener, which is created once per note.
   const userRef = useRef(user);
   useEffect(() => {
     userRef.current = user;
   }, [user]);
+
+  // Follow the site's light/dark switch. The editor is rebuilt when it flips.
+  useEffect(() => {
+    const root = document.documentElement;
+    const read = () => setDark(root.dataset.theme === 'dark');
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -62,7 +74,7 @@ export default function CodeEditor({ noteId, user }) {
         lineNumbers(),
         history(),
         javascript(),
-        oneDark,
+        dark ? oneDark : syntaxHighlighting(defaultHighlightStyle),
         EditorView.lineWrapping,
         keymap.of([...defaultKeymap, ...historyKeymap]),
         EditorView.updateListener.of((updateEvent) => {
@@ -118,7 +130,7 @@ export default function CodeEditor({ noteId, user }) {
       view.destroy();
       viewRef.current = null;
     };
-  }, [noteId, updateStats]);
+  }, [noteId, updateStats, dark]);
 
   return (
     <div className="glass flex h-full min-h-[26rem] flex-col overflow-hidden">

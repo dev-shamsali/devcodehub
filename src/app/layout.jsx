@@ -81,13 +81,24 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: '#07090d',
-  colorScheme: 'dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#eeeeee' },
+    { media: '(prefers-color-scheme: dark)', color: '#101010' },
+  ],
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" data-theme="light" suppressHydrationWarning>
+      <head>
+        <script
+          // Apply the saved theme before first paint so there is no flash. Constant string, no user input.
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('dch-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}",
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} bg-ink-900 text-text-hi antialiased`}
       >
@@ -96,7 +107,6 @@ export default function RootLayout({ children }) {
           // Structured data is a static object built in our own code, not user input.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.graph()) }}
         />
-        <div className="grain" aria-hidden="true" />
         {children}
       </body>
     </html>

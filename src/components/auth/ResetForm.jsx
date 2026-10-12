@@ -10,11 +10,11 @@ export default function ResetForm({ token }) {
 
   if (state?.done) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-7">
         <FormMessage message="Password updated. You can log in with it now." />
         <Link
           href="/login"
-          className="block rounded-full btn-primary px-4 py-2.5 text-center text-sm font-medium text-white"
+          className="btn-primary block px-6 py-4 text-center text-[0.95rem] font-medium"
         >
           Go to login
         </Link>
@@ -23,7 +23,7 @@ export default function ResetForm({ token }) {
   }
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-7">
       <input type="hidden" name="token" value={token} />
       <Field label="New password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} />
       <Field label="Confirm password" name="confirm" type="password" autoComplete="new-password" minLength={8} maxLength={72} />

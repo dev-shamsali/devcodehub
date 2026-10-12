@@ -18,7 +18,7 @@ export default async function SignupPage({ searchParams }) {
           Have an account?{' '}
           <Link
             href={next ? `/login?next=${encodeURIComponent(dest)}` : '/login'}
-            className="text-text-hi hover:underline"
+            className="swiss-link text-(--ink)"
           >
             Log in
           </Link>

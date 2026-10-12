@@ -11,12 +11,12 @@ export default function LoginForm({ next, initialError }) {
     <>
       <GoogleButton action={googleAction} next={next} />
       <Divider />
-      <form action={formAction} className="space-y-4">
+      <form action={formAction} className="space-y-7">
         <input type="hidden" name="next" value={next || ''} />
         <Field label="Email" name="email" type="email" autoComplete="email" />
         <Field label="Password" name="password" type="password" autoComplete="current-password" />
         <div className="text-right">
-          <Link href="/forgot-password" className="text-[0.8rem] text-text-mid hover:text-text-hi">
+          <Link href="/forgot-password" className="swiss-link text-[0.85rem] text-(--mute)">
             Forgot password?
           </Link>
         </div>

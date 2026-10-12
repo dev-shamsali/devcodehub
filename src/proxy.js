@@ -16,11 +16,11 @@ export default auth((req) => {
     return NextResponse.redirect(url);
   }
   // Logged-in users have no business on the auth forms.
-  if (req.auth && ['/login', '/signup', '/forgot-password'].includes(pathname)) {
+  if (req.auth && ['/', '/login', '/signup', '/forgot-password'].includes(pathname)) {
     return NextResponse.redirect(new URL('/editor', req.nextUrl.origin));
   }
 });
 
 export const config = {
-  matcher: ['/media/:path*', '/editor/:path*', '/login', '/signup', '/forgot-password'],
+  matcher: ['/', '/media/:path*', '/editor/:path*', '/login', '/signup', '/forgot-password'],
 };

@@ -5,13 +5,13 @@ import { useFormStatus } from 'react-dom';
 export function Field({ label, name, type = 'text', autoComplete, ...rest }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[0.8rem] text-text-mid">{label}</span>
+      <span className="mb-1 block text-[0.8rem] text-(--mute)">{label}</span>
       <input
         name={name}
         type={type}
         autoComplete={autoComplete}
         required
-        className="w-full rounded-[12px] border border-white/12 bg-white/[0.05] px-3.5 py-2.5 text-sm text-text-hi shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] outline-none transition-colors placeholder:text-text-lo focus:border-brand focus:bg-white/[0.07] focus:ring-2 focus:ring-brand/30"
+        className="w-full border-0 border-b border-(--ink) bg-transparent px-0 py-2.5 text-[1.05rem] text-(--ink) outline-none transition-colors placeholder:text-(--mute) focus:border-(--accent)"
         {...rest}
       />
     </label>
@@ -24,7 +24,7 @@ export function SubmitButton({ children, pendingLabel }) {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-full btn-primary px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-60"
+      className="btn-primary w-full px-6 py-4 text-[0.95rem] font-medium"
     >
       {pending ? pendingLabel : children}
     </button>
@@ -34,14 +34,14 @@ export function SubmitButton({ children, pendingLabel }) {
 export function FormMessage({ error, message }) {
   if (error) {
     return (
-      <p role="alert" className="rounded-[12px] border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
+      <p role="alert" className="border-l-2 border-danger pl-3 text-[0.9rem] text-danger">
         {error}
       </p>
     );
   }
   if (message) {
     return (
-      <p role="status" className="rounded-[12px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-text-hi">
+      <p role="status" className="border-l-2 border-(--ink) pl-3 text-[0.9rem] text-(--ink)">
         {message}
       </p>
     );
@@ -55,7 +55,7 @@ export function GoogleButton({ action, next }) {
       <input type="hidden" name="next" value={next || ''} />
       <button
         type="submit"
-        className="glass-pill flex w-full items-center justify-center gap-2.5 px-4 py-2.5 text-sm font-medium text-text-hi transition-colors hover:bg-white/10"
+        className="flex w-full items-center justify-center gap-2.5 border border-(--ink) px-4 py-3.5 text-[0.95rem] font-medium text-(--ink) transition-colors hover:bg-(--ink) hover:text-(--paper)"
       >
         <svg aria-hidden="true" viewBox="0 0 48 48" className="h-4 w-4">
           <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.5 17.7 9.5 24 9.5z" />
@@ -71,10 +71,10 @@ export function GoogleButton({ action, next }) {
 
 export function Divider() {
   return (
-    <div className="my-5 flex items-center gap-3 text-xs text-text-lo" aria-hidden="true">
-      <span className="h-px flex-1 bg-white/10" />
+    <div className="my-6 flex items-center gap-3 text-[0.8rem] text-(--mute)" aria-hidden="true">
+      <span className="h-px flex-1 bg-(--line)" />
       or
-      <span className="h-px flex-1 bg-white/10" />
+      <span className="h-px flex-1 bg-(--line)" />
     </div>
   );
 }

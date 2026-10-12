@@ -11,7 +11,7 @@ export default function SignupForm({ next }) {
     <>
       <GoogleButton action={googleAction} next={next} />
       <Divider />
-      <form action={formAction} className="space-y-4">
+      <form action={formAction} className="space-y-7">
         <input type="hidden" name="next" value={next || ''} />
         <Field label="Name" name="name" autoComplete="name" />
         <Field label="Email" name="email" type="email" autoComplete="email" />
@@ -28,11 +28,11 @@ export default function SignupForm({ next }) {
         <SubmitButton pendingLabel="Creating account...">Create account</SubmitButton>
         <p className="text-center text-xs text-text-lo">
           By creating an account you agree to the{' '}
-          <Link href="/terms" className="text-text-mid underline underline-offset-4 hover:text-text-hi">
+          <Link href="/terms" className="swiss-link text-(--ink)">
             Terms
           </Link>{' '}
           and{' '}
-          <Link href="/privacy" className="text-text-mid underline underline-offset-4 hover:text-text-hi">
+          <Link href="/privacy" className="swiss-link text-(--ink)">
             Privacy Policy
           </Link>
           .

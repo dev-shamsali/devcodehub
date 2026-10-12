@@ -75,7 +75,7 @@ export default function EditorWorkspace({ user }) {
                 </p>
                 <button
                   onClick={() => setIsSidebarOpen(true)}
-                  className="mt-5 rounded-full bg-brand-solid px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-solid-hover active:scale-[0.98] md:hidden"
+                  className="mt-5 btn-primary px-5 py-2.5 text-sm font-medium md:hidden"
                 >
                   Browse snippets
                 </button>

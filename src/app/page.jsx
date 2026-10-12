@@ -10,6 +10,7 @@ import Developer from '@/components/swiss/Developer';
 import Closing from '@/components/swiss/Closing';
 import Footer from '@/components/swiss/Footer';
 import { SITE } from '@/lib/site';
+import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 
 const title = 'What DevCodeHub is and how it works';
@@ -30,10 +31,12 @@ export const metadata = {
 
 export default async function HomePage() {
   const session = await auth();
+  // Signed in today: skip the landing page and go straight to the editor.
+  if (session?.user?.id) redirect('/editor');
   return (
     <SwissShell>
       <Hero />
-      <SwissNav user={session?.user ?? null} />
+      <SwissNav user={null} />
       <main>
         <HeroBody />
         <Statement />

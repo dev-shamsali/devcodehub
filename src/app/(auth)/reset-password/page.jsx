@@ -14,7 +14,7 @@ export default async function ResetPasswordPage({ searchParams }) {
     <AuthShell
       title="Set a new password"
       footer={
-        <Link href="/login" className="text-text-hi hover:underline">
+        <Link href="/login" className="swiss-link text-(--ink)">
           Back to log in
         </Link>
       }
@@ -22,9 +22,9 @@ export default async function ResetPasswordPage({ searchParams }) {
       {valid ? (
         <ResetForm token={token} />
       ) : (
-        <p className="text-sm text-text-mid">
+        <p className="text-[0.95rem] text-(--mute)">
           This reset link is invalid or has expired.{' '}
-          <Link href="/forgot-password" className="text-text-hi hover:underline">
+          <Link href="/forgot-password" className="swiss-link text-(--ink)">
             Request a new one
           </Link>
           .
