@@ -34,7 +34,7 @@ export function SubmitButton({ children, pendingLabel }) {
 export function FormMessage({ error, message }) {
   if (error) {
     return (
-      <p role="alert" className="rounded-[12px] border border-brand/30 bg-brand/10 px-3 py-2 text-sm text-brand-soft">
+      <p role="alert" className="rounded-[12px] border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
         {error}
       </p>
     );

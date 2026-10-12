@@ -118,7 +118,7 @@ export default function MediaWorkspace() {
               onChanged={handleChanged}
             />
           ) : (
-            <div className="glass liquid liquid-card flex h-full min-h-[24rem] items-center justify-center p-8">
+            <div className="glass flex h-full min-h-[24rem] items-center justify-center p-8">
               <div className="max-w-sm text-center">
                 <div className="liquid liquid-icon mx-auto mb-5 !h-14 !w-14">
                   <Images className="h-6 w-6" strokeWidth={1.75} />

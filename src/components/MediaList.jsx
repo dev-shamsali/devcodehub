@@ -244,7 +244,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
               {isCreating ? '...' : 'Add'}
             </motion.button>
           </div>
-          {error && <p className="mt-2 text-[11px] text-brand-soft">{error}</p>}
+          {error && <p className="mt-2 text-[11px] text-danger">{error}</p>}
         </div>
 
         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
@@ -346,7 +346,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
                               setConfirm({ open: true, share });
                               setMenuOpen(null);
                             }}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-xs text-brand-soft transition-colors hover:bg-brand/10"
+                            className="flex w-full items-center gap-2 px-3 py-2 text-xs text-danger transition-colors hover:bg-danger/10"
                           >
                             <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} /> Delete
                           </motion.button>
@@ -390,7 +390,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="glass w-full max-w-xs p-4">
-                <Dialog.Title className="text-sm font-semibold text-brand-soft">
+                <Dialog.Title className="text-sm font-semibold text-danger">
                   Delete this share
                 </Dialog.Title>
                 <p className="mt-1 text-[11px] leading-relaxed text-text-mid">

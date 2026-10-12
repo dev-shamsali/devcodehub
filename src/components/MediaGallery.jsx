@@ -282,8 +282,8 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
       </header>
 
       {notice && (
-        <div className="flex items-start gap-2 border-b border-brand/20 bg-brand/10 px-4 py-2.5">
-          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-soft" strokeWidth={1.75} />
+        <div className="flex items-start gap-2 border-b border-danger/25 bg-danger/10 px-4 py-2.5">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-danger" strokeWidth={1.75} />
           <p className="flex-1 text-[0.78rem] leading-relaxed text-text-mid">{notice}</p>
           <button
             onClick={() => setNotice('')}
@@ -337,7 +337,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
                   <div className="flex h-full min-h-[7rem] flex-col justify-between">
                     <p className="truncate text-[0.76rem] text-text-mid">{item.name}</p>
                     {item.error ? (
-                      <p className="text-[0.72rem] leading-snug text-brand-soft">{item.error}</p>
+                      <p className="text-[0.72rem] leading-snug text-danger">{item.error}</p>
                     ) : (
                       <div>
                         <div className="mb-1.5 flex items-center gap-1.5 text-[0.72rem] text-text-lo">
@@ -427,7 +427,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
                         <motion.button
                           whileTap={tapScale}
                           onClick={() => removeFile(file)}
-                          className="rounded p-1 text-text-lo transition-colors hover:bg-brand/15 hover:text-brand-soft"
+                          className="rounded p-1 text-text-lo transition-colors hover:bg-danger/15 hover:text-danger"
                           aria-label={`Delete ${file.name}`}
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />

@@ -502,7 +502,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
     <>
       <div className="flex h-full flex-col text-text-hi">
         {/* HEADER */}
-        <div className="bg-ink-800/85 backdrop-blur-xl px-4 py-3 border-b border-white/8 flex items-center justify-between sticky top-0 z-30">
+        <div className="bg-ink-800/40 backdrop-blur-xl px-4 py-3 border-b border-white/8 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-2">
             <FolderOpen className="w-5 h-5 text-brand" />
             <h2 className="text-base font-semibold">Codes</h2>
@@ -513,20 +513,20 @@ export default function NoteList({ onSelect, onDelete, user }) {
         </div>
 
         {/* SEARCH */}
-        <div className="bg-ink-800/85 backdrop-blur-xl px-4 py-3 border-b border-white/8 sticky top-[44px] z-20">
+        <div className="bg-ink-800/40 backdrop-blur-xl px-4 py-3 border-b border-white/8 sticky top-[44px] z-20">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-lo" />
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search codes..."
-              className="w-full rounded-[10px] border border-white/10 bg-white/[0.04] py-2 pl-9 pr-3 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
+              className="w-full rounded-[12px] border border-white/10 bg-white/[0.04] py-2 pl-9 pr-3 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
             />
           </div>
         </div>
 
         {/* ADD + BULK */}
-        <div className="bg-ink-800/85 backdrop-blur-xl px-4 py-3 border-b border-white/8 sticky top-[92px] z-20 space-y-2">
+        <div className="bg-ink-800/40 backdrop-blur-xl px-4 py-3 border-b border-white/8 sticky top-[92px] z-20 space-y-2">
           <div className="flex gap-2">
             <input
               value={newNoteName}
@@ -536,13 +536,13 @@ export default function NoteList({ onSelect, onDelete, user }) {
               }}
               onKeyDown={(e) => e.key === 'Enter' && createNote()}
               placeholder="New code name..."
-              className="flex-1 rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
+              className="flex-1 rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
             />
             <motion.button
               whileTap={tapScale}
               onClick={createNote}
               disabled={!newNoteName.trim() || isCreating}
-              className="px-4 py-2 rounded-lg bg-brand-solid text-white text-sm font-medium hover:bg-brand-solid-hover disabled:bg-white/[0.10] disabled:text-text-lo"
+              className="px-4 py-2 rounded-full btn-liquid text-white text-sm font-medium disabled:opacity-50"
             >
               {isCreating ? '...' : 'Add'}
             </motion.button>
@@ -568,7 +568,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
               whileTap={tapScale}
               onClick={deleteSelected}
               disabled={!selectedIds.size}
-              className="px-2 py-1 rounded bg-brand/10 text-brand-soft hover:bg-brand/15 disabled:opacity-40"
+              className="px-2 py-1 rounded-full bg-danger/12 text-danger hover:bg-danger/20 disabled:opacity-40"
             >
               Delete selected
             </motion.button>
@@ -576,7 +576,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
               whileTap={tapScale}
               onClick={openMasterDeleteModal}
               disabled={!notes.length}
-              className="px-3 py-1.5 rounded bg-brand-solid text-white text-xs font-semibold hover:bg-brand-solid-hover disabled:opacity-40"
+              className="px-3 py-1.5 rounded-full btn-danger text-white text-xs font-semibold"
             >
               Delete all
             </motion.button>
@@ -584,7 +584,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
         </div>
 
         {/* LIST */}
-        <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
+        <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overflow-x-hidden px-2.5 py-2">
           {loading ? (
             <div className="text-center py-8 text-text-lo text-sm">
               Loading…
@@ -604,19 +604,19 @@ export default function NoteList({ onSelect, onDelete, user }) {
                   animate="animate"
                   exit="exit"
                   transition={listItemTransition}
-                  className="flex items-center justify-between rounded-[10px] border border-white/8 bg-white/[0.025] px-3 py-2 transition-colors hover:border-white/14 hover:bg-white/[0.06]"
+                  className="flex min-w-0 items-center justify-between rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2.5 transition-colors hover:border-white/20 hover:bg-white/[0.07]"
                 >
                   {/* Checkbox */}
                   <input
                     type="checkbox"
                     checked={selectedIds.has(note.id)}
                     onChange={() => toggleSelect(note.id)}
-                    className="accent-blue-600 mr-2"
+                    className="accent-[#3d8dff] mr-2"
                   />
 
                   {/* Note info */}
                   <div
-                    className={`flex-1 cursor-pointer ${
+                    className={`min-w-0 flex-1 cursor-pointer ${
                       note.locked ? 'opacity-70' : ''
                     }`}
                     onClick={() =>
@@ -625,13 +625,13 @@ export default function NoteList({ onSelect, onDelete, user }) {
                         : onSelect?.(note.id, note.name)
                     }
                   >
-                    <div className="flex items-center gap-2 text-sm font-medium text-text-hi">
+                    <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-text-hi">
                       <span className="truncate">{note.name}</span>
                       {note.pinned && (
-                        <Pin className="w-4 h-4 text-brand-soft" />
+                        <Pin className="h-4 w-4 shrink-0 text-brand-soft" />
                       )}
                       {note.locked && (
-                        <Lock className="w-4 h-4 text-text-mid" />
+                        <Lock className="h-4 w-4 shrink-0 text-text-mid" />
                       )}
                     </div>
                     <p className="text-[10px] text-text-lo">
@@ -746,7 +746,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                               openDeleteLockedModal(note);
                               setDropdownOpen(null);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-brand-soft hover:bg-brand/10"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-danger hover:bg-danger/10"
                           >
                             🗑️ Delete
                           </motion.button>
@@ -761,7 +761,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
         </div>
 
         {error && (
-          <p className="text-center text-xs text-brand-soft py-2">
+          <p className="text-center text-xs text-danger py-2">
             {error}
           </p>
         )}
@@ -818,11 +818,11 @@ export default function NoteList({ onSelect, onDelete, user }) {
                     setPinError('');
                   }}
                   maxLength={4}
-                  className="w-full rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
+                  className="w-full rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
                   autoFocus
                 />
                 {pinError && (
-                  <p className="text-[10px] text-brand-soft mt-1">
+                  <p className="text-[10px] text-danger mt-1">
                     {pinError}
                   </p>
                 )}
@@ -841,7 +841,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                   </button>
                   <button
                     onClick={handlePinModalConfirm}
-                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover active:scale-95 transition-transform duration-100"
+                    className="px-3 py-1 text-xs rounded-full btn-liquid text-white active:scale-95 transition-transform duration-100"
                   >
                     Confirm
                   </button>
@@ -911,7 +911,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                         onConfirm: null,
                       });
                     }}
-                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover active:scale-95 transition-transform duration-100"
+                    className="px-3 py-1 text-xs rounded-full btn-liquid text-white active:scale-95 transition-transform duration-100"
                   >
                     Yes
                   </button>
@@ -951,7 +951,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="glass w-full max-w-xs p-4">
-                <Dialog.Title className="text-sm font-semibold text-brand-soft">
+                <Dialog.Title className="text-sm font-semibold text-danger">
                   Delete ALL codes
                 </Dialog.Title>
                 <p className="text-[11px] text-text-mid mt-1">
@@ -965,11 +965,11 @@ export default function NoteList({ onSelect, onDelete, user }) {
                     setMasterValue(e.target.value);
                     setMasterError('');
                   }}
-                  className="mt-2 w-full rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
+                  className="mt-2 w-full rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
                   placeholder="Master password"
                 />
                 {masterError && (
-                  <p className="text-[10px] text-brand-soft mt-1">
+                  <p className="text-[10px] text-danger mt-1">
                     {masterError}
                   </p>
                 )}
@@ -983,7 +983,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                   <button
                     onClick={confirmMasterDelete}
                     disabled={masterChecking}
-                    className="px-3 py-1 text-xs rounded bg-brand-solid text-white hover:bg-brand-solid-hover disabled:opacity-60 active:scale-95 transition-transform duration-100"
+                    className="px-3 py-1 text-xs rounded-full btn-liquid text-white disabled:opacity-60 active:scale-95 transition-transform duration-100"
                   >
                     {masterChecking ? 'Checking...' : 'Delete all'}
                   </button>

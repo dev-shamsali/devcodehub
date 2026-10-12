@@ -43,6 +43,11 @@
   --blue-8: #1d4fa8;
   --blue-dim: rgb(61 141 255 / 0.14);
 
+  /* Destructive actions and errors. Never the brand blue, so danger reads as danger. */
+  --danger: #ff7a85;
+  --danger-solid: #d6323f;
+  --danger-solid-hover: #bd2733;
+
   --text-hi: #f2f5fa;
   --text-mid: #a7b0c0;
   --text-lo: #8791a3;
@@ -80,6 +85,9 @@
   --color-brand-solid-hover: var(--blue-solid-hover);
   --color-brand-soft: var(--blue-11);
   --color-brand-deep: var(--blue-8);
+
+  --color-danger: var(--danger);
+  --color-danger-solid: var(--danger-solid);
 
   --color-text-hi: var(--text-hi);
   --color-text-mid: var(--text-mid);
@@ -400,4 +408,50 @@ body::before {
   opacity: 0.4;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+}
+
+/* Danger button: same lit-pill construction as .btn-liquid, in red. */
+.btn-danger {
+  background: linear-gradient(180deg, #e0404d, #c22b38);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    inset 0 -1px 0 rgb(0 0 0 / 0.22),
+    0 8px 22px -10px rgb(214 50 63 / 0.7);
+  transition: filter 0.2s;
+}
+
+.btn-danger:hover {
+  filter: brightness(1.08);
+}
+
+.btn-danger:disabled {
+  opacity: 0.45;
+}
+
+/*
+  Scrollbars: thin and quiet, so a list inside a glass panel does not pick up
+  the chunky default bar. Firefox reads scrollbar-*, WebKit/Blink the pseudo.
+*/
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.16);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.28);
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }

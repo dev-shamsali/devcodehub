@@ -50,7 +50,7 @@ export default function EditorWorkspace({ user }) {
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-hidden">
           <NoteList onSelect={handleSelect} user={user} />
         </div>
       </aside>
@@ -98,7 +98,7 @@ export default function EditorWorkspace({ user }) {
           {selectedNoteId ? (
             <CodeEditor noteId={selectedNoteId} user={user} />
           ) : (
-            <div className="glass liquid liquid-card flex h-full min-h-[24rem] items-center justify-center p-8">
+            <div className="glass flex h-full min-h-[24rem] items-center justify-center p-8">
               <div className="max-w-sm text-center">
                 <div className="liquid liquid-icon mx-auto mb-5 !h-14 !w-14">
                   <FileCode2 className="h-6 w-6" strokeWidth={1.75} />
