@@ -398,3 +398,82 @@ body::before {
 *::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/*
+  Swiss landing theme. Paper and ink, one blue taken from the logo, hairline
+  column guides. Scoped to .swiss so the app (dark glass) is untouched.
+  [data-theme] on the wrapper is the page-level light/dark switch; a section
+  marked .swiss-flip always shows the opposite theme, for rhythm.
+*/
+.swiss {
+  --paper: #eeeeee;
+  --ink: #101010;
+  --mute: #6a6a6a;
+  --line: rgb(16 16 16 / 0.13);
+  --accent: #2a73e8;
+  position: relative;
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.swiss[data-theme='dark'],
+.swiss[data-theme='light'] .swiss-flip {
+  --paper: #101010;
+  --ink: #f1f1f1;
+  --mute: #8d8d8d;
+  --line: rgb(255 255 255 / 0.14);
+  --accent: #4d93ff;
+}
+
+.swiss[data-theme='dark'] .swiss-flip {
+  --paper: #eeeeee;
+  --ink: #101010;
+  --mute: #6a6a6a;
+  --line: rgb(16 16 16 / 0.13);
+  --accent: #2a73e8;
+}
+
+.swiss-flip {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Eight equal columns drawn as hairlines (four on a phone). */
+.swiss-cols {
+  background-image: linear-gradient(to right, var(--line) 1px, transparent 1px);
+  background-size: 25% 100%;
+}
+
+@media (min-width: 768px) {
+  .swiss-cols {
+    background-size: 12.5% 100%;
+  }
+}
+
+.swiss ::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+.swiss :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 0;
+}
+
+.swiss a,
+.swiss button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.swiss-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+}
+
+.swiss-link:hover {
+  color: var(--accent);
+}

@@ -1,12 +1,14 @@
-import SiteNav from '@/components/landing/SiteNav';
-import Hero from '@/components/landing/Hero';
-import StackStrip from '@/components/landing/StackStrip';
-import Features from '@/components/landing/Features';
-import Workflow from '@/components/landing/Workflow';
-import Faq from '@/components/landing/Faq';
-import Developer from '@/components/landing/Developer';
-import ClosingCta from '@/components/landing/ClosingCta';
-import SiteFooter from '@/components/landing/SiteFooter';
+import SwissShell from '@/components/swiss/SwissShell';
+import SwissNav from '@/components/swiss/SwissNav';
+import Hero, { HeroBody } from '@/components/swiss/Hero';
+import Statement from '@/components/swiss/Statement';
+import Features from '@/components/swiss/Features';
+import WordField from '@/components/swiss/WordField';
+import Workflow from '@/components/swiss/Workflow';
+import Faq from '@/components/swiss/Faq';
+import Developer from '@/components/swiss/Developer';
+import Closing from '@/components/swiss/Closing';
+import Footer from '@/components/swiss/Footer';
 import { SITE } from '@/lib/site';
 import { auth } from '@/auth';
 
@@ -29,18 +31,20 @@ export const metadata = {
 export default async function HomePage() {
   const session = await auth();
   return (
-    <>
-      <SiteNav user={session?.user ?? null} />
+    <SwissShell>
+      <Hero />
+      <SwissNav user={session?.user ?? null} />
       <main>
-        <Hero />
-        <StackStrip />
+        <HeroBody />
+        <Statement />
         <Features />
+        <WordField />
         <Workflow />
         <Faq />
         <Developer />
-        <ClosingCta />
+        <Closing />
       </main>
-      <SiteFooter />
-    </>
+      <Footer />
+    </SwissShell>
   );
 }
