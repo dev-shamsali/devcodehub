@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireUser } from '@/lib/auth/guard';
 import { getShares, isConfigured, describeDbError } from '@/lib/mongodb';
 
 export const runtime = 'nodejs';
@@ -38,6 +39,9 @@ function sanitise(input) {
 }
 
 export async function POST(request, { params }) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   if (!isConfigured()) return notConfigured();
 
   const { id } = await params;
@@ -83,6 +87,9 @@ export async function POST(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   if (!isConfigured()) return notConfigured();
 
   const { id } = await params;

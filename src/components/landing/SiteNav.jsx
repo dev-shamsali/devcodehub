@@ -11,15 +11,17 @@ import {
 } from 'motion/react';
 import { Menu, X } from 'lucide-react';
 import Wordmark from './Wordmark';
+import { logoutAction } from '@/app/(auth)/actions';
 
 const LINKS = [
-  { href: '/info#features', label: 'Features' },
-  { href: '/info#workflow', label: 'Workflow' },
+  { href: '/#features', label: 'Features' },
+  { href: '/#workflow', label: 'Workflow' },
+  { href: '/editor', label: 'Editor' },
   { href: '/media', label: 'Media' },
-  { href: '/info#faq', label: 'FAQ' },
+  { href: '/#faq', label: 'FAQ' },
 ];
 
-export default function SiteNav() {
+export default function SiteNav({ user = null }) {
   const [open, setOpen] = useState(false);
   const [lifted, setLifted] = useState(false);
   const { scrollY } = useScroll();
@@ -33,17 +35,15 @@ export default function SiteNav() {
   });
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
+    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5">
       <div
-        className={`transition-colors duration-300 ${
-          lifted
-            ? 'border-b border-white/8 bg-ink-900/72 backdrop-blur-xl'
-            : 'border-b border-transparent'
+        className={`glass-pill mx-auto max-w-[1100px] transition-shadow duration-300 ${
+          lifted ? 'shadow-[0_18px_50px_-20px_rgba(0,0,0,0.95)]' : ''
         }`}
       >
         <nav
           aria-label="Primary"
-          className="mx-auto flex h-[68px] max-w-[1200px] items-center justify-between gap-6 px-5 sm:px-8"
+          className="flex h-[60px] items-center justify-between gap-6 pl-5 pr-3 sm:pl-6"
         >
           <Link href="/" className="shrink-0">
             <Wordmark className="text-[1.05rem]" />
@@ -63,18 +63,44 @@ export default function SiteNav() {
           </ul>
 
           <div className="flex items-center gap-2">
+            {user ? (
+              <form action={logoutAction} className="hidden sm:block">
+                <button
+                  type="submit"
+                  className="px-3 py-2 text-[0.86rem] text-text-mid transition-colors hover:text-text-hi"
+                >
+                  Log out
+                </button>
+              </form>
+            ) : (
+              <Link
+                href="/login"
+                className="hidden px-3 py-2 text-[0.86rem] text-text-mid transition-colors hover:text-text-hi sm:block"
+              >
+                Log in
+              </Link>
+            )}
             <motion.div
               whileHover={reduce ? undefined : { y: -2 }}
               whileTap={reduce ? undefined : { scale: 0.94 }}
               transition={{ type: 'spring', stiffness: 400, damping: 22 }}
               className="hidden sm:block"
             >
-              <Link
-                href="/"
-                className="block rounded-full bg-brand-solid px-4 py-2 text-[0.86rem] font-medium text-white transition-colors hover:bg-brand-solid-hover"
-              >
-                Open editor
-              </Link>
+              {user ? (
+                <Link
+                  href="/editor"
+                  className="block rounded-full btn-liquid px-4 py-2 text-[0.86rem] font-medium text-white transition-colors"
+                >
+                  Open editor
+                </Link>
+              ) : (
+                <Link
+                  href="/signup"
+                  className="block rounded-full btn-liquid px-4 py-2 text-[0.86rem] font-medium text-white transition-colors"
+                >
+                  Create account
+                </Link>
+              )}
             </motion.div>
             <button
               onClick={() => setOpen((v) => !v)}
@@ -118,9 +144,9 @@ export default function SiteNav() {
         initial={false}
         animate={{ height: open ? 'auto' : 0, opacity: open ? 1 : 0 }}
         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-        className="overflow-hidden border-b border-white/8 bg-ink-900/95 backdrop-blur-xl md:hidden"
+        className="glass mx-auto mt-2 max-w-[1100px] overflow-hidden !rounded-[22px] md:hidden"
       >
-        <ul className="mx-auto flex max-w-[1200px] flex-col gap-1 px-5 py-4">
+        <ul className="flex flex-col gap-1 px-4 py-4">
           {LINKS.map((link) => (
             <li key={link.href}>
               <Link
@@ -133,13 +159,42 @@ export default function SiteNav() {
             </li>
           ))}
           <li className="pt-2">
-            <Link
-              href="/"
-              onClick={() => setOpen(false)}
-              className="block rounded-full bg-brand-solid px-4 py-2.5 text-center text-sm font-medium text-white"
-            >
-              Open editor
-            </Link>
+            {user ? (
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/editor"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-full btn-liquid px-4 py-2.5 text-center text-sm font-medium text-white"
+                >
+                  Open editor
+                </Link>
+                <form action={logoutAction}>
+                  <button
+                    type="submit"
+                    className="w-full rounded-full border border-white/10 px-4 py-2.5 text-center text-sm text-text-mid"
+                  >
+                    Log out
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/signup"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-full btn-liquid px-4 py-2.5 text-center text-sm font-medium text-white"
+                >
+                  Create account
+                </Link>
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-full border border-white/10 px-4 py-2.5 text-center text-sm text-text-mid"
+                >
+                  Log in
+                </Link>
+              </div>
+            )}
           </li>
         </ul>
       </motion.div>

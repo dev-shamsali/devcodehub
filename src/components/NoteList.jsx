@@ -24,7 +24,7 @@ import {
 
 const THIRTY_SIX_HOURS_MS = 36 * 60 * 60 * 1000;
 
-export default function NoteList({ onSelect, onDelete }) {
+export default function NoteList({ onSelect, onDelete, user }) {
   const [notes, setNotes] = useState([]);
   const [newNoteName, setNewNoteName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -158,6 +158,8 @@ export default function NoteList({ onSelect, onDelete }) {
             pinCode: n.pinCode || '',
             createdAt,
             lastModified,
+            createdBy: n.createdBy || '',
+            lastEditedBy: n.lastEditedBy || '',
           });
         }
 
@@ -243,6 +245,10 @@ export default function NoteList({ onSelect, onDelete }) {
         name: trimmed,
         content: '',
         createdAt: now,
+        createdBy: user?.name || '',
+        createdById: user?.id || '',
+        lastEditedBy: user?.name || '',
+        lastEditedById: user?.id || '',
         lastModified: now,
         pinned: false,
         locked: false,
@@ -279,6 +285,8 @@ export default function NoteList({ onSelect, onDelete }) {
       await update(ref(database, `notes/${note.id}`), {
         pinned: !note.pinned,
         lastModified: Date.now(),
+        lastEditedBy: user?.name || '',
+        lastEditedById: user?.id || '',
       });
     } catch (e) {
       console.error('Toggle pin failed:', e);
@@ -302,6 +310,8 @@ export default function NoteList({ onSelect, onDelete }) {
         locked: false,
         pinCode: '',
         lastModified: Date.now(),
+        lastEditedBy: user?.name || '',
+        lastEditedById: user?.id || '',
       }).catch((e) => console.error(e));
       return;
     }
@@ -442,6 +452,8 @@ export default function NoteList({ onSelect, onDelete }) {
           locked: true,
           pinCode: val || '',
           lastModified: Date.now(),
+        lastEditedBy: user?.name || '',
+        lastEditedById: user?.id || '',
         });
         setPinModal({ open: false, action: null, noteId: null });
       }
@@ -455,6 +467,8 @@ export default function NoteList({ onSelect, onDelete }) {
           locked: false,
           pinCode: '',
           lastModified: Date.now(),
+        lastEditedBy: user?.name || '',
+        lastEditedById: user?.id || '',
         });
         setPinModal({ open: false, action: null, noteId: null });
       }
@@ -623,6 +637,14 @@ export default function NoteList({ onSelect, onDelete }) {
                     <p className="text-[10px] text-text-lo">
                       Modified {formatDate(note.lastModified)}
                     </p>
+                    {(note.createdBy || note.lastEditedBy) && (
+                      <p className="truncate text-[10px] text-text-lo">
+                        {note.createdBy && <>Created by {note.createdBy}</>}
+                        {note.lastEditedBy && note.lastEditedBy !== note.createdBy && (
+                          <> {note.createdBy ? '/ ' : ''}edited by {note.lastEditedBy}</>
+                        )}
+                      </p>
+                    )}
                   </div>
 
                   {/* Dropdown */}
@@ -706,6 +728,8 @@ export default function NoteList({ onSelect, onDelete }) {
                                   {
                                     name: newName.trim(),
                                     lastModified: Date.now(),
+        lastEditedBy: user?.name || '',
+        lastEditedById: user?.id || '',
                                   }
                                 );
                               }

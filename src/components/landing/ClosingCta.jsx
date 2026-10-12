@@ -26,11 +26,11 @@ export default function ClosingCta() {
 
           <div className="relative">
             <h2 className="mx-auto max-w-[20ch] font-display text-3xl font-semibold leading-[1.1] tracking-[-0.025em] text-text-hi md:text-[2.75rem]">
-              The next snippet does not need a paste.
+              Send the next file as a link.
             </h2>
             <p className="mx-auto mt-5 max-w-[46ch] text-[1rem] leading-relaxed text-text-mid">
-              Open the editor, name a buffer and send the link. That is the
-              entire setup.
+              Create an account, name a share and drop your files in. The link is
+              ready as soon as you are.
             </p>
             <motion.div
               whileHover={reduce ? undefined : { y: -2 }}
@@ -39,10 +39,10 @@ export default function ClosingCta() {
               className="mt-9 inline-block"
             >
               <Link
-                href="/"
-                className="group inline-flex items-center gap-2 rounded-full bg-brand-solid px-7 py-3.5 text-[0.96rem] font-medium text-white transition-colors hover:bg-brand-solid-hover"
+                href="/signup"
+                className="group inline-flex items-center gap-2 btn-liquid rounded-full px-7 py-3.5 text-[0.96rem] font-medium text-white transition-colors"
               >
-                Open editor
+                Get started
                 <ArrowRight
                   className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
                   strokeWidth={2}

@@ -64,7 +64,7 @@ export default function Developer() {
 
           <p className="mt-4 max-w-[56ch] text-[0.92rem] leading-relaxed text-text-lo">
             DevCodeHub is his own project, designed, built and maintained solo on
-            Next.js, React and Firebase.
+            Next.js, React and MongoDB.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">

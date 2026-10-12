@@ -14,7 +14,7 @@ export default function SpotlightCard({ as: Tag, className = '', children, ...mo
   const reduce = useReducedMotion();
   const x = useMotionValue(-999);
   const y = useMotionValue(-999);
-  const background = useMotionTemplate`radial-gradient(320px circle at ${x}px ${y}px, rgb(229 72 77 / 0.14), transparent 72%)`;
+  const background = useMotionTemplate`radial-gradient(320px circle at ${x}px ${y}px, rgb(61 141 255 / 0.16), transparent 72%)`;
 
   const handleMove = (event) => {
     if (reduce) return;

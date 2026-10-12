@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { database } from "../lib/firebase";
 import { ref, onValue, onDisconnect, set, remove } from "firebase/database";
-import { initAuth } from "../lib/auth";
+import { initAuth } from "../lib/firebase-auth";
 import { 
   Users, 
   User, 

@@ -1,8 +1,24 @@
 import { test, expect } from '@playwright/test';
+import { encode } from 'next-auth/jwt';
+
+const AUTH_SECRET = 'playwright-test-secret-not-for-production';
+const COOKIE = 'authjs.session-token';
+
+/** /media is login-gated, so each test starts with a signed session cookie. */
+async function signIn(context) {
+  const expiresAt = Date.now() + 60 * 60 * 1000;
+  const value = await encode({
+    token: { id: 'test-user', name: 'Test', email: 'test@example.com', expiresAt },
+    secret: AUTH_SECRET,
+    salt: COOKIE,
+    maxAge: 3600,
+  });
+  await context.addCookies([{ name: COOKIE, value, url: 'http://localhost:3100' }]);
+}
+
 
 /**
- * The /media route never touches Firebase, so it can run without real
- * credentials. ImageKit and MongoDB are mocked at the network layer instead
+ * The /media route needs no real credentials. ImageKit and MongoDB are mocked at the network layer instead
  * of being reached for real, since this environment has none configured.
  */
 
@@ -94,6 +110,10 @@ async function openShare(page) {
 }
 
 test.describe('media upload', () => {
+  test.beforeEach(async ({ context }) => {
+    await signIn(context);
+  });
+
   test('accepts image, zip, pdf, and docx files', async ({ page }) => {
     await mockBackend(page);
     await openShare(page);

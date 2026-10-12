@@ -8,16 +8,16 @@ import { motion, useReducedMotion } from 'motion/react';
  */
 const MOVES = [
   {
-    verb: 'Name it',
-    body: 'Open the editor and give the snippet a name. It exists the moment you hit create, with no project or repo to set up first.',
+    verb: 'Sign in',
+    body: 'Create an account or continue with Google. You stay signed in until midnight India time.',
   },
   {
-    verb: 'Send it',
-    body: 'Drop the link in the review thread. Whoever opens it is signed in anonymously and looking at your buffer.',
+    verb: 'Create it',
+    body: 'Name a snippet in the editor, or a share in Media. It exists the moment you press create.',
   },
   {
-    verb: 'Work it',
-    body: 'Both of you type into the same document. When the fix is right, download it or pin it and move on.',
+    verb: 'Send the link',
+    body: 'Teammates open it and see your edits and files as they land, with names on every change.',
   },
 ];
 
@@ -25,7 +25,7 @@ export default function Workflow() {
   const reduce = useReducedMotion();
 
   return (
-    <section id="workflow" className="edge-top scroll-mt-20">
+    <section id="workflow" className="edge-top scroll-mt-24">
       <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-8 lg:py-28">
         <motion.h2
           initial={reduce ? false : { opacity: 0, y: 18 }}
@@ -34,7 +34,7 @@ export default function Workflow() {
           transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-[24ch] font-display text-3xl font-semibold leading-[1.12] tracking-[-0.025em] text-text-hi md:text-4xl"
         >
-          Three moves, start to finish.
+          From login to shared in three moves.
         </motion.h2>
 
         <ol className="relative mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
@@ -65,7 +65,7 @@ export default function Workflow() {
             >
               <span
                 aria-hidden="true"
-                className="mb-6 block h-[18px] w-[18px] rounded-full border-2 border-brand bg-ink-900"
+                className="liquid mb-6 block h-[18px] w-[18px] rounded-full border-2 border-brand bg-ink-900"
               />
               <h3 className="font-display text-xl font-semibold tracking-tight text-text-hi">
                 {move.verb}

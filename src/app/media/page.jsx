@@ -5,7 +5,7 @@ import { SITE, AUTHOR } from '@/lib/site';
 
 const title = 'Share images and zip files with your team';
 const description =
-  'DevCodeHub Media is a free realtime drop for images and zip archives. Create a share, add as many files as you like, send the link. No account required.';
+  'DevCodeHub Media is a free realtime drop for images and zip archives. Create a share, add as many files as you like, send the link.';
 
 export const metadata = {
   title,
@@ -59,7 +59,6 @@ const mediaJsonLd = {
         'Share zip archives',
         'Direct CDN links per file',
         'Realtime updates across viewers',
-        'No account required',
       ],
     },
     {

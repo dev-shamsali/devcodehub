@@ -13,7 +13,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { Copy, Check, Loader2, Wifi, WifiOff } from 'lucide-react';
 import { AUTHOR } from '@/lib/site';
 
-export default function CodeEditor({ noteId }) {
+export default function CodeEditor({ noteId, user }) {
   const editorContainerRef = useRef(null);
   const viewRef = useRef(null);
 
@@ -28,6 +28,12 @@ export default function CodeEditor({ noteId }) {
   const [isSaving, setIsSaving] = useState(false);
   const [lineCount, setLineCount] = useState(1);
   const [charCount, setCharCount] = useState(0);
+  const [meta, setMeta] = useState({ createdBy: '', lastEditedBy: '', lastModified: 0 });
+  // Read inside the CodeMirror listener, which is created once per note.
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -65,7 +71,12 @@ export default function CodeEditor({ noteId }) {
           if (isRemoteUpdate.current) return;
 
           setIsSaving(true);
-          update(noteRef, { content: updateEvent.state.doc.toString() }).finally(
+          update(noteRef, {
+            content: updateEvent.state.doc.toString(),
+            lastModified: Date.now(),
+            lastEditedBy: userRef.current?.name || '',
+            lastEditedById: userRef.current?.id || '',
+          }).finally(
             () => setTimeout(() => setIsSaving(false), 300)
           );
         }),
@@ -79,7 +90,13 @@ export default function CodeEditor({ noteId }) {
       noteRef,
       (snapshot) => {
         setIsConnected(true);
-        const content = snapshot.val()?.content || '';
+        const val = snapshot.val() || {};
+        setMeta({
+          createdBy: val.createdBy || '',
+          lastEditedBy: val.lastEditedBy || '',
+          lastModified: val.lastModified || 0,
+        });
+        const content = val.content || '';
         if (view.state.doc.toString() === content) return;
 
         isRemoteUpdate.current = true;
@@ -106,7 +123,7 @@ export default function CodeEditor({ noteId }) {
   return (
     <div className="glass flex h-full min-h-[26rem] flex-col overflow-hidden">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 px-4 py-3">
-        <span className="flex items-center gap-2 text-[0.78rem]">
+        <span className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.78rem]">
           {isConnected ? (
             <>
               <Wifi className="h-3.5 w-3.5 text-emerald-400" strokeWidth={1.75} />
@@ -117,6 +134,15 @@ export default function CodeEditor({ noteId }) {
               <WifiOff className="h-3.5 w-3.5 text-brand" strokeWidth={1.75} />
               <span className="text-brand-soft">Reconnecting</span>
             </>
+          )}
+          <span className="text-text-lo">
+            Created by <span className="text-text-hi">{meta.createdBy || 'Unknown'}</span>
+          </span>
+          {meta.lastEditedBy && (
+            <span className="text-text-lo">
+              Last edited by <span className="text-text-hi">{meta.lastEditedBy}</span>
+              {meta.lastModified ? ` at ${new Date(meta.lastModified).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
+            </span>
           )}
         </span>
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireUser } from '@/lib/auth/guard';
 import { IMAGEKIT, MEDIA_FOLDER } from '@/lib/imagekit';
 
 export const runtime = 'nodejs';
@@ -15,6 +16,9 @@ export const dynamic = 'force-dynamic';
  * behaviour is guaranteed rather than best-effort.
  */
 export async function GET(request) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   const { searchParams } = new URL(request.url);
   const fileUrl = searchParams.get('url') || '';
   const name = (searchParams.get('name') || 'download').replace(/["\r\n]/g, '').slice(0, 200);

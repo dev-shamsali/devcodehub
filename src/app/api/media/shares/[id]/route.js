@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireUser } from '@/lib/auth/guard';
 import { getShares, isConfigured, describeDbError } from '@/lib/mongodb';
 
 export const runtime = 'nodejs';
@@ -13,6 +14,9 @@ const notConfigured = () =>
 const VALID_ID = /^[A-Za-z0-9_-]{1,40}$/;
 
 export async function GET(request, { params }) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   if (!isConfigured()) return notConfigured();
 
   // Next 16: params is a promise and must be awaited.
@@ -52,6 +56,9 @@ export async function GET(request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   if (!isConfigured()) return notConfigured();
 
   const { id } = await params;
@@ -87,6 +94,9 @@ export async function PATCH(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   if (!isConfigured()) return notConfigured();
 
   const { id } = await params;

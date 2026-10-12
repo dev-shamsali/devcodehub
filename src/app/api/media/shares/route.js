@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireUser } from '@/lib/auth/guard';
 import { getShares, isConfigured, describeDbError } from '@/lib/mongodb';
 
 export const runtime = 'nodejs';
@@ -25,6 +26,9 @@ function toClient(doc) {
 }
 
 export async function GET() {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   if (!isConfigured()) return notConfigured();
 
   try {
@@ -55,6 +59,9 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   if (!isConfigured()) return notConfigured();
 
   let name;

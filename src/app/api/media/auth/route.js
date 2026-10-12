@@ -1,4 +1,5 @@
 import { getUploadAuthParams } from '@imagekit/next/server';
+import { requireUser } from '@/lib/auth/guard';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
@@ -12,12 +13,12 @@ export const dynamic = 'force-dynamic';
  * client receives only { token, signature, expire }, which authorise a single
  * upload window and nothing else.
  *
- * Note this endpoint is unauthenticated, which is inherent to direct
- * browser-to-ImageKit uploads: anyone who can load the page can request a
- * signature. Uploads are confined to MEDIA_FOLDER, but quota abuse is still
- * possible. Put this behind real auth before it matters.
+ * Requires a signed-in user, so only logged-in people can request a signature.
  */
 export async function GET() {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
   const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY;
 

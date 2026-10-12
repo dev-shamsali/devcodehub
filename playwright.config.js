@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  testMatch: '**/*.spec.js',
   fullyParallel: true,
   retries: 0,
   reporter: 'list',
@@ -11,15 +12,13 @@ export default defineConfig({
   },
   webServer: {
     command: 'npm run dev -- --port 3100',
-    // Health-checks /media, not /, because / renders the Codes editor which
-    // needs real Firebase credentials this environment does not have.
-    url: 'http://localhost:3100/media',
+    url: 'http://localhost:3100/login',
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
     env: {
-      // /media never touches Firebase, so these can stay unset for the
-      // upload e2e tests. ImageKit/Mongo calls are mocked in the tests
-      // themselves via page.route.
+      // ImageKit/Mongo calls are mocked in the tests via page.route. The
+      // session cookie is signed with this secret (see tests/upload.spec.js).
+      AUTH_SECRET: 'playwright-test-secret-not-for-production',
       NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: 'https://ik.imagekit.io/test',
       NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY: 'public_test_key',
     },

@@ -6,9 +6,8 @@ export default function robots() {
       {
         userAgent: '*',
         allow: '/',
-        // Only the API is withheld. / is the editor and crawlable on purpose:
-        // it is the page brand searchers want, so it has to be eligible to rank.
-        disallow: ['/api/'],
+        // The landing page is crawlable; the API and signed-in/auth pages are not.
+        disallow: ['/api/', '/media', '/editor', '/login', '/signup', '/forgot-password', '/reset-password'],
       },
     ],
     sitemap: `${SITE.url}/sitemap.xml`,

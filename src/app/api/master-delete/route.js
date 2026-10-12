@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { timingSafeEqual } from 'node:crypto';
+import { requireUser } from '@/lib/auth/guard';
 
 export const runtime = 'nodejs';
 
@@ -11,6 +12,9 @@ function safeEqual(a, b) {
 }
 
 export async function POST(request) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   const secret = process.env.MASTER_DELETE_PASSWORD;
 
   if (!secret) {

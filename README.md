@@ -127,3 +127,21 @@ git add README.md
 git commit -m "Add clean, complete README for CodeExchanger"
 git push
 Your GitHub project will now look professional and clear for sharing, showcasing, and deploying.# codeexchnager
+
+
+## Authentication and deployment
+
+Accounts live in MongoDB. Sign in with email and password or with Google
+(Auth.js v5). A session ends at the next midnight in India Standard Time
+(UTC+05:30), whenever the user logged in. `/editor`, `/media` and `/api/media/*`
+require a session; the editor records who created and last edited each snippet.
+
+1. Copy `.env.example` to `.env` and fill every value.
+2. Google Cloud Console: create an OAuth Web client. Authorized redirect URIs:
+   `https://<your-domain>/api/auth/callback/google` and
+   `http://localhost:3000/api/auth/callback/google`.
+3. Password reset emails use SMTP (Gmail needs an App Password).
+4. Set `AUTH_SECRET` (`openssl rand -base64 32`) and `APP_URL` (no trailing slash).
+5. `npm run build && npm start`.
+
+Checks: `npm run lint`, `npm run test:unit`, `npm run test:e2e`.

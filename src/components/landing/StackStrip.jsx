@@ -11,7 +11,7 @@ import { motion, useReducedMotion } from 'motion/react';
 const STACK = [
   { slug: 'nextdotjs', name: 'Next.js' },
   { slug: 'react', name: 'React' },
-  { slug: 'firebase', name: 'Firebase' },
+  { slug: 'mongodb', name: 'MongoDB' },
   { slug: 'tailwindcss', name: 'Tailwind CSS' },
   { slug: 'vercel', name: 'Vercel' },
 ];
@@ -43,7 +43,7 @@ export default function StackStrip() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`https://cdn.simpleicons.org/${tech.slug}/a9a6b1`}
+                src={`https://cdn.simpleicons.org/${tech.slug}/a7b0c0`}
                 alt={tech.name}
                 width={26}
                 height={26}

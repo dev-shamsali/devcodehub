@@ -32,13 +32,11 @@ export const metadata = {
   description: SITE.description,
   applicationName: SITE.name,
   keywords: [
-    'code snippet sharing',
-    'realtime code editor',
-    'collaborative code editor',
-    'share code with team',
-    'online code exchange',
-    'pair programming tool',
-    'code review snippets',
+    'share images with team',
+    'share zip files online',
+    'file sharing for developers',
+    'share screenshots link',
+    'team file drop',
     'DevCodeHub',
     AUTHOR.name,
   ],
@@ -83,7 +81,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: '#0a090b',
+  themeColor: '#07090d',
   colorScheme: 'dark',
 };
 

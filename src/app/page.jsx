@@ -1,40 +1,46 @@
-import EditorWorkspace from '@/components/EditorWorkspace';
+import SiteNav from '@/components/landing/SiteNav';
+import Hero from '@/components/landing/Hero';
+import StackStrip from '@/components/landing/StackStrip';
+import Features from '@/components/landing/Features';
+import Workflow from '@/components/landing/Workflow';
+import Faq from '@/components/landing/Faq';
+import Developer from '@/components/landing/Developer';
+import ClosingCta from '@/components/landing/ClosingCta';
+import SiteFooter from '@/components/landing/SiteFooter';
 import { SITE } from '@/lib/site';
+import { auth } from '@/auth';
 
-const title = 'Realtime collaborative code editor';
-const description =
-  'Open the DevCodeHub editor and share a code snippet your team can edit live. Create a snippet, send the link, watch edits land as they happen. No account required.';
+const title = 'What DevCodeHub is and how it works';
+const description = SITE.description;
 
 export const metadata = {
   title,
   description,
   alternates: { canonical: '/' },
-  keywords: [
-    'realtime code editor',
-    'collaborative code editor online',
-    'share code snippet link',
-    'pair programming editor',
-    'DevCodeHub editor',
-  ],
   openGraph: {
     type: 'website',
-    url: SITE.url,
+    url: `${SITE.url}`,
     siteName: SITE.name,
     title: `${title} | ${SITE.name}`,
     description,
   },
 };
 
-/**
- * The editor fills the window and nothing follows it. The description and
- * authorship a crawler needs are carried by the metadata and the root
- * layout's JSON-LD graph rather than by visible marketing copy, because this
- * route is a tool, not the marketing page (that's /info).
- */
-export default function Home() {
+export default async function HomePage() {
+  const session = await auth();
   return (
-    <div className="h-[100dvh]">
-      <EditorWorkspace />
-    </div>
+    <>
+      <SiteNav user={session?.user ?? null} />
+      <main>
+        <Hero />
+        <StackStrip />
+        <Features />
+        <Workflow />
+        <Faq />
+        <Developer />
+        <ClosingCta />
+      </main>
+      <SiteFooter />
+    </>
   );
 }

@@ -15,7 +15,7 @@ export default function OpengraphImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: '#0a090b',
+          background: '#07090d',
           padding: '72px',
           position: 'relative',
         }}
@@ -29,15 +29,15 @@ export default function OpengraphImage() {
             width: 720,
             height: 720,
             borderRadius: 9999,
-            background: 'radial-gradient(circle, rgba(229,72,77,0.42) 0%, rgba(229,72,77,0) 68%)',
+            background: 'radial-gradient(circle, rgba(61,141,255,0.42) 0%, rgba(61,141,255,0) 68%)',
             display: 'flex',
           }}
         />
 
         <div style={{ display: 'flex', alignItems: 'center', fontSize: 30, letterSpacing: '-0.02em' }}>
-          <span style={{ color: '#f4f3f5', fontWeight: 600 }}>dev</span>
-          <span style={{ color: '#e5484d', fontWeight: 600 }}>/</span>
-          <span style={{ color: '#f4f3f5', fontWeight: 600 }}>codehub</span>
+          <span style={{ color: '#f2f5fa', fontWeight: 600 }}>dev</span>
+          <span style={{ color: '#3d8dff', fontWeight: 600 }}>/</span>
+          <span style={{ color: '#f2f5fa', fontWeight: 600 }}>codehub</span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -47,23 +47,23 @@ export default function OpengraphImage() {
               fontSize: 82,
               lineHeight: 1.05,
               letterSpacing: '-0.035em',
-              color: '#f4f3f5',
+              color: '#f2f5fa',
               fontWeight: 600,
               maxWidth: 900,
             }}
           >
-            Paste it once. Your team edits it live.
+            Share files with your team in one link.
           </div>
           <div
             style={{
               display: 'flex',
               marginTop: 28,
               fontSize: 29,
-              color: '#a9a6b1',
+              color: '#a7b0c0',
               maxWidth: 800,
             }}
           >
-            Realtime code snippet exchange. No account, no install.
+            Images, zips and documents, shared in seconds.
           </div>
         </div>
 
@@ -76,7 +76,7 @@ export default function OpengraphImage() {
             color: '#75727d',
           }}
         >
-          <span style={{ display: 'flex', width: 10, height: 10, borderRadius: 9999, background: '#e5484d' }} />
+          <span style={{ display: 'flex', width: 10, height: 10, borderRadius: 9999, background: '#3d8dff' }} />
           <span style={{ display: 'flex' }}>Built by {AUTHOR.name}</span>
         </div>
       </div>

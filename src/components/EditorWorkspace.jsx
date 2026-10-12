@@ -2,13 +2,14 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Menu, X, FileCode2, Images, ArrowLeft } from 'lucide-react';
+import { Menu, X, FileCode2, Images, ArrowLeft, LogOut } from 'lucide-react';
+import { logoutAction } from '@/app/(auth)/actions';
 import NoteList from '@/components/NoteList';
 import CodeEditor from '@/components/CodeEditor';
 import Wordmark from '@/components/landing/Wordmark';
 import SocialLinks from '@/components/landing/SocialLinks';
 
-export default function EditorWorkspace() {
+export default function EditorWorkspace({ user }) {
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -18,12 +19,7 @@ export default function EditorWorkspace() {
   }, []);
 
   return (
-    <div className="relative flex h-full overflow-hidden bg-ink-900">
-      {/* Ambient brand wash. Fixed, so it never repaints while the editor scrolls. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed -left-40 top-0 h-[36rem] w-[36rem] rounded-full bg-brand/12 blur-[120px]"
-      />
+    <div className="relative flex h-full overflow-hidden">
 
       <div
         onClick={() => setIsSidebarOpen(false)}
@@ -33,13 +29,13 @@ export default function EditorWorkspace() {
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-[19rem] transform flex-col border-r border-white/8 bg-ink-800/80 backdrop-blur-xl transition-transform duration-300 ease-out sm:w-80 md:static md:w-[22rem] md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-[19rem] transform flex-col border-r border-white/10 bg-ink-900/60 backdrop-blur-2xl transition-transform duration-300 ease-out sm:w-80 md:static md:w-[22rem] md:translate-x-0 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3.5">
           <Link
-            href="/info"
+            href="/"
             className="flex items-center gap-2 text-text-mid transition-colors hover:text-text-hi"
           >
             <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
@@ -55,12 +51,12 @@ export default function EditorWorkspace() {
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <NoteList onSelect={handleSelect} />
+          <NoteList onSelect={handleSelect} user={user} />
         </div>
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-white/8 bg-ink-900/80 px-4 py-3 backdrop-blur-xl">
+        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-white/10 bg-ink-900/40 px-4 py-3 backdrop-blur-2xl">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="rounded-full border border-white/10 bg-white/5 p-2 text-text-hi transition-colors hover:bg-white/10 md:hidden"
@@ -79,18 +75,33 @@ export default function EditorWorkspace() {
               <span className="hidden sm:inline">Media</span>
             </Link>
             <span aria-hidden="true" className="h-4 w-px bg-white/10" />
+            {user?.name && (
+              <span className="hidden max-w-[10rem] truncate text-[0.82rem] text-text-hi sm:block" title={user.name}>
+                {user.name}
+              </span>
+            )}
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-1.5 text-[0.82rem] text-text-mid transition-colors hover:text-text-hi"
+              >
+                <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} />
+                <span className="hidden sm:inline">Log out</span>
+              </button>
+            </form>
+            <span aria-hidden="true" className="h-4 w-px bg-white/10" />
             <SocialLinks />
           </div>
         </div>
 
         <div className="min-h-0 flex-1 p-3 sm:p-5">
           {selectedNoteId ? (
-            <CodeEditor noteId={selectedNoteId} />
+            <CodeEditor noteId={selectedNoteId} user={user} />
           ) : (
-            <div className="glass flex h-full min-h-[24rem] items-center justify-center p-8">
+            <div className="glass liquid liquid-card flex h-full min-h-[24rem] items-center justify-center p-8">
               <div className="max-w-sm text-center">
-                <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-brand/25 bg-brand/10">
-                  <FileCode2 className="h-5 w-5 text-brand-soft" strokeWidth={1.75} />
+                <div className="liquid liquid-icon mx-auto mb-5 !h-14 !w-14">
+                  <FileCode2 className="h-6 w-6" strokeWidth={1.75} />
                 </div>
                 <h2 className="font-display text-xl tracking-tight text-text-hi">
                   Nothing open yet

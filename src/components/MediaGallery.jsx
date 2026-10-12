@@ -262,7 +262,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
         <motion.button
           whileTap={tapScale}
           onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-full bg-brand-solid px-4 py-2 text-[0.82rem] font-medium text-white transition-colors hover:bg-brand-solid-hover"
+          className="inline-flex items-center gap-1.5 rounded-full btn-liquid px-4 py-2 text-[0.82rem] font-medium text-white transition-colors"
         >
           <UploadCloud className="h-4 w-4" strokeWidth={1.75} />
           Add files
@@ -301,15 +301,15 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
             {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="aspect-square animate-pulse rounded-[10px] border border-white/8 bg-white/[0.03]"
+                className="aspect-square animate-pulse rounded-[12px] border border-white/8 bg-white/[0.03]"
               />
             ))}
           </div>
         ) : files.length === 0 && pending.length === 0 ? (
           <div className="flex h-full min-h-[18rem] items-center justify-center">
             <div className="max-w-sm text-center">
-              <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-brand/25 bg-brand/10">
-                <UploadCloud className="h-5 w-5 text-brand-soft" strokeWidth={1.75} />
+              <div className="liquid liquid-icon mx-auto mb-5 !h-14 !w-14">
+                <UploadCloud className="h-6 w-6" strokeWidth={1.75} />
               </div>
               <h3 className="font-display text-lg tracking-tight text-text-hi">
                 Drop images, a zip, PDF, or Word doc
@@ -332,7 +332,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
                   animate="animate"
                   exit="exit"
                   transition={gridItemTransition}
-                  className="relative overflow-hidden rounded-[10px] border border-white/8 bg-white/[0.03] p-3"
+                  className="relative overflow-hidden rounded-[12px] border border-white/8 bg-white/[0.03] p-3"
                 >
                   <div className="flex h-full min-h-[7rem] flex-col justify-between">
                     <p className="truncate text-[0.76rem] text-text-mid">{item.name}</p>
@@ -369,7 +369,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
                     animate="animate"
                     exit="exit"
                     transition={gridItemTransition}
-                    className="group relative overflow-hidden rounded-[10px] border border-white/8 bg-white/[0.025] transition-colors hover:border-white/16"
+                    className="group relative overflow-hidden rounded-[12px] border border-white/8 bg-white/[0.025] transition-colors hover:border-white/16"
                   >
                     {zip || doc ? (
                       <div className="flex aspect-square flex-col items-center justify-center gap-2 p-3">
@@ -484,7 +484,7 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
               src={`${lightbox.url}?tr=w-1600,c-at_max`}
               alt={lightbox.name}
               onClick={(e) => e.stopPropagation()}
-              className="max-h-full max-w-full rounded-[10px] object-contain"
+              className="max-h-full max-w-full rounded-[12px] object-contain"
             />
           </motion.div>
         )}

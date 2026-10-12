@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireUser } from '@/lib/auth/guard';
 import { MEDIA_FOLDER } from '@/lib/imagekit';
 
 export const runtime = 'nodejs';
@@ -48,6 +49,9 @@ async function fetchDetails(fileId, privateKey) {
  * asset in the account.
  */
 export async function POST(request) {
+  const gate = await requireUser();
+  if (gate.response) return gate.response;
+
   const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
   if (!privateKey) {
     return NextResponse.json(

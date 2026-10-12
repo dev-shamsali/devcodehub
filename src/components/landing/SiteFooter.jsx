@@ -40,7 +40,7 @@ export default function SiteFooter() {
             href="/"
             className="text-[0.86rem] text-text-mid transition-colors hover:text-text-hi"
           >
-            Editor
+            Home
           </Link>
           <Link
             href="/media"

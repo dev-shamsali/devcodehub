@@ -9,9 +9,9 @@
 export const SITE = {
   name: 'DevCodeHub',
   url: 'https://devcodehub.cloud',
-  tagline: 'Realtime code snippet exchange for development teams',
+  tagline: 'Realtime code editor and file sharing for development teams',
   description:
-    'DevCodeHub is a realtime code exchange where development teams share, edit and manage small snippets together. Create a snippet, send the link, edit it live with your team. No account required.',
+    'DevCodeHub is a realtime code editor and a shared file drop for development teams. Edit snippets live, share images and zip files, and see who created and edited each one. Sign in with email or Google.',
   locale: 'en_US',
 };
 
@@ -19,7 +19,7 @@ export const AUTHOR = {
   name: 'Shams Ali Shaikh',
   shortName: 'Shams Ali',
   role: 'Full stack developer',
-  bio: 'Shams Ali Shaikh is a full stack developer who builds realtime web products with Next.js, React and Firebase. He designed and built DevCodeHub to remove the friction of pasting snippets between chat apps during code review.',
+  bio: 'Shams Ali Shaikh is a full stack developer who builds web products with Next.js and React. He designed and built DevCodeHub to remove the friction of attaching the same screenshots and archives to every chat thread during code review.',
   github: 'https://github.com/dev-shamsali',
   linkedin: 'https://www.linkedin.com/in/shams-ali-shaikh-27194425a/',
   instagram: 'https://www.instagram.com/shamsss.in/',
@@ -27,8 +27,8 @@ export const AUTHOR = {
   knowsAbout: [
     'Next.js',
     'React',
-    'Firebase Realtime Database',
-    'Realtime collaboration',
+    'MongoDB',
+    'Web authentication',
     'Full stack web development',
   ],
 };
@@ -43,31 +43,31 @@ export const AUTHOR = {
 export const FAQ = [
   {
     q: 'What is DevCodeHub?',
-    a: `DevCodeHub is a free realtime code exchange for development teams. You create a named snippet, share its link, and everyone with the link edits the same buffer live. It is built for the small pieces of code that move between people during review and debugging, not for full projects.`,
+    a: 'DevCodeHub is a free workspace for development teams with two tools. The editor lets everyone with a snippet link edit the same code live and shows who created and last edited it. Media is a shared drop for images, zip files, PDFs and Word documents.',
   },
   {
     q: 'Who built DevCodeHub?',
-    a: `DevCodeHub was designed and built by ${AUTHOR.name}, a full stack developer working in Next.js, React and Firebase. He built it after getting tired of pasting the same snippet into three chat windows during code review. You can find his work at ${AUTHOR.github}.`,
+    a: `DevCodeHub was designed and built by ${AUTHOR.name}, a full stack developer working in Next.js and React. He built it after getting tired of attaching the same screenshots to three chat threads during code review. You can find his work at ${AUTHOR.github}.`,
   },
   {
     q: 'Do I need an account to use DevCodeHub?',
-    a: 'No. DevCodeHub signs you in anonymously the moment you open the editor, so you can create and share a snippet without registering, confirming an email or installing anything.',
+    a: 'Yes. Sign up with an email and password or with Google. You stay signed in until midnight India time, then log in again.',
   },
   {
-    q: 'How does realtime editing work in DevCodeHub?',
-    a: 'Every snippet is a record in Firebase Realtime Database. When you type, the change is written to that record and pushed to every other connected browser within a fraction of a second, so all collaborators see the same content without refreshing.',
+    q: 'Which files can I share?',
+    a: 'Images, zip archives, PDFs and Word documents, up to 25 MB per file. Each file gets a direct link you can paste into an issue or a pull request.',
   },
   {
-    q: 'Which programming languages does DevCodeHub support?',
-    a: 'The editor uses CodeMirror 6 with JavaScript and TypeScript syntax highlighting, and snippets can be downloaded in the file extension that matches their language. Any plain text pastes and shares correctly regardless of language.',
+    q: 'How do other people see new files?',
+    a: 'The share refreshes itself every few seconds, so a file you add shows up for everyone who has that share open. Nobody has to reload the page.',
   },
   {
     q: 'Is DevCodeHub free?',
-    a: 'Yes. DevCodeHub is free to use and there is no paid tier, seat count or usage limit.',
+    a: 'Yes. DevCodeHub is free to use and there is no paid tier or seat count.',
   },
   {
-    q: 'How long do DevCodeHub snippets last?',
-    a: 'Unpinned snippets are cleared automatically 36 hours after their last edit, which keeps the workspace from filling up with dead pastes. Pin a snippet to keep it indefinitely.',
+    q: 'How long do shares last?',
+    a: 'Unpinned shares are cleared automatically 36 hours after their last change, which keeps the workspace from filling up. Pin a share to keep it.',
   },
 ];
 
@@ -117,27 +117,28 @@ export const jsonLd = {
             priceCurrency: 'USD',
           },
           featureList: [
-            'Realtime collaborative editing',
-            'Shareable snippet links',
-            'Anonymous access with no signup',
-            'Syntax highlighting via CodeMirror 6',
-            'Pin and lock snippets',
-            'Snippet download',
+            'Realtime collaborative code editor',
+            'Creator and last-editor names on every snippet',
+            'Image, zip, PDF and Word uploads',
+            'Direct CDN link for every file',
+            'Shares that refresh for everyone watching',
+            'Sign in with email or Google',
+            'Pin a share to keep it',
           ],
         },
         {
           // Sitelink hint. Google decides whether to show sitelinks and which
-          // ones, but naming the editor as primary navigation is how you tell
+          // ones, but naming the media route as primary navigation is how you tell
           // it this route matters. It is a signal, never a guarantee.
           '@type': 'SiteNavigationElement',
           '@id': `${SITE.url}/#nav`,
           name: ['Editor', 'Media', 'Features', 'FAQ', 'Developer'],
           url: [
-            SITE.url,
+            `${SITE.url}/editor`,
             `${SITE.url}/media`,
-            `${SITE.url}/info#features`,
-            `${SITE.url}/info#faq`,
-            `${SITE.url}/info#developer`,
+            `${SITE.url}/#features`,
+            `${SITE.url}/#faq`,
+            `${SITE.url}/#developer`,
           ],
         },
         {

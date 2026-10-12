@@ -200,7 +200,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
   return (
     <>
       <div className="flex h-full flex-col text-text-hi">
-        <div className="sticky top-0 z-30 flex items-center justify-between border-b border-white/8 bg-ink-800/85 px-4 py-3 backdrop-blur-xl">
+        <div className="sticky top-0 z-30 flex items-center justify-between border-b border-white/8 bg-ink-800/40 px-4 py-3 backdrop-blur-xl">
           <div className="flex items-center gap-2">
             <Images className="h-5 w-5 text-brand" strokeWidth={1.75} />
             <h2 className="text-base font-semibold">Shares</h2>
@@ -208,7 +208,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
           <span className="text-xs text-text-lo">Total: {shares.length}</span>
         </div>
 
-        <div className="sticky top-[52px] z-20 border-b border-white/8 bg-ink-800/85 px-4 py-3 backdrop-blur-xl">
+        <div className="sticky top-[52px] z-20 border-b border-white/8 bg-ink-800/40 px-4 py-3 backdrop-blur-xl">
           <div className="relative">
             <Search
               className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-lo"
@@ -218,12 +218,12 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search shares..."
-              className="w-full rounded-[10px] border border-white/10 bg-white/[0.04] py-2 pl-9 pr-3 text-sm text-text-hi outline-none placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30"
+              className="w-full rounded-[12px] border border-white/10 bg-white/[0.04] py-2 pl-9 pr-3 text-sm text-text-hi outline-none placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30"
             />
           </div>
         </div>
 
-        <div className="sticky top-[113px] z-20 border-b border-white/8 bg-ink-800/85 px-4 py-3 backdrop-blur-xl">
+        <div className="sticky top-[113px] z-20 border-b border-white/8 bg-ink-800/40 px-4 py-3 backdrop-blur-xl">
           <div className="flex gap-2">
             <input
               value={newName}
@@ -233,13 +233,13 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
               }}
               onKeyDown={(e) => e.key === 'Enter' && createShare()}
               placeholder="New share name..."
-              className="flex-1 rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi outline-none placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30"
+              className="flex-1 rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi outline-none placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30"
             />
             <motion.button
               whileTap={tapScale}
               onClick={createShare}
               disabled={!newName.trim() || isCreating}
-              className="rounded-[10px] bg-brand-solid px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-solid-hover disabled:bg-white/[0.10] disabled:text-text-lo"
+              className="rounded-[12px] btn-liquid px-4 py-2 text-sm font-medium text-white transition-colors disabled:bg-white/[0.10] disabled:text-text-lo"
             >
               {isCreating ? '...' : 'Add'}
             </motion.button>
@@ -253,7 +253,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="h-[58px] animate-pulse rounded-[10px] border border-white/8 bg-white/[0.03]"
+                  className="h-[58px] animate-pulse rounded-[12px] border border-white/8 bg-white/[0.03]"
                 />
               ))}
             </div>
@@ -276,7 +276,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
                     animate="animate"
                     exit="exit"
                     transition={listItemTransition}
-                    className={`relative flex items-center gap-2 rounded-[10px] border px-3 py-2 transition-colors ${
+                    className={`relative flex items-center gap-2 rounded-[12px] border px-3 py-2 transition-colors ${
                       active
                         ? 'border-brand/40 bg-brand/10'
                         : 'border-white/8 bg-white/[0.025] hover:border-white/14 hover:bg-white/[0.06]'
@@ -406,7 +406,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
                   </button>
                   <button
                     onClick={deleteShare}
-                    className="rounded bg-brand-solid px-3 py-1 text-xs text-white transition-colors hover:bg-brand-solid-hover"
+                    className="rounded btn-liquid px-3 py-1 text-xs text-white transition-colors"
                   >
                     Delete
                   </button>
