@@ -1,6 +1,7 @@
 import MediaWorkspace from '@/components/MediaWorkspace';
 import MediaPitch from '@/components/landing/MediaPitch';
 import SiteFooter from '@/components/landing/SiteFooter';
+import { auth } from '@/auth';
 import { SITE, AUTHOR } from '@/lib/site';
 
 const title = 'Share images and zip files with your team';
@@ -94,7 +95,12 @@ const mediaJsonLd = {
   ],
 };
 
-export default function MediaRoute() {
+export default async function MediaRoute() {
+  const session = await auth();
+  const user = session?.user
+    ? { id: session.user.id, name: session.user.name || session.user.email || '' }
+    : null;
+
   return (
     <>
       <script
@@ -102,7 +108,7 @@ export default function MediaRoute() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(mediaJsonLd) }}
       />
       <div id="media" className="h-[100dvh]">
-        <MediaWorkspace />
+        <MediaWorkspace user={user} />
       </div>
       <main>
         <MediaPitch />

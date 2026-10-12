@@ -35,7 +35,7 @@ export default function SiteFooter() {
           </p>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
           <Link
             href="/"
             className="text-[0.86rem] text-text-mid transition-colors hover:text-text-hi"
@@ -61,7 +61,7 @@ export default function SiteFooter() {
             Media
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <motion.a
               href={AUTHOR.github}
               rel="me noopener noreferrer"

@@ -2,12 +2,11 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Menu, X, FileCode2, Images, ArrowLeft, LogOut } from 'lucide-react';
-import { logoutAction } from '@/app/(auth)/actions';
+import { X, FileCode2, ArrowLeft } from 'lucide-react';
+import AppBar from '@/components/AppBar';
 import NoteList from '@/components/NoteList';
 import CodeEditor from '@/components/CodeEditor';
 import Wordmark from '@/components/landing/Wordmark';
-import SocialLinks from '@/components/landing/SocialLinks';
 
 export default function EditorWorkspace({ user }) {
   const [selectedNoteId, setSelectedNoteId] = useState(null);
@@ -56,43 +55,7 @@ export default function EditorWorkspace({ user }) {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-white/10 bg-ink-900/40 px-4 py-3 backdrop-blur-2xl">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="rounded-full border border-white/10 bg-white/5 p-2 text-text-hi transition-colors hover:bg-white/10 md:hidden"
-            aria-label="Open snippet list"
-          >
-            <Menu className="h-4 w-4" strokeWidth={1.75} />
-          </button>
-          <Wordmark className="text-[0.9rem] md:hidden" />
-
-          <div className="ml-auto flex items-center gap-3 sm:gap-4">
-            <Link
-              href="/media"
-              className="inline-flex items-center gap-1.5 text-[0.82rem] text-text-mid transition-colors hover:text-text-hi"
-            >
-              <Images className="h-3.5 w-3.5" strokeWidth={1.75} />
-              <span className="hidden sm:inline">Media</span>
-            </Link>
-            <span aria-hidden="true" className="h-4 w-px bg-white/10" />
-            {user?.name && (
-              <span className="hidden max-w-[10rem] truncate text-[0.82rem] text-text-hi sm:block" title={user.name}>
-                {user.name}
-              </span>
-            )}
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1.5 text-[0.82rem] text-text-mid transition-colors hover:text-text-hi"
-              >
-                <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} />
-                <span className="hidden sm:inline">Log out</span>
-              </button>
-            </form>
-            <span aria-hidden="true" className="h-4 w-px bg-white/10" />
-            <SocialLinks />
-          </div>
-        </div>
+        <AppBar user={user} onMenu={() => setIsSidebarOpen(true)} menuLabel="Open snippet list" />
 
         <div className="min-h-0 flex-1 p-3 sm:p-5">
           {selectedNoteId ? (

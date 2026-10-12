@@ -85,7 +85,15 @@ export default function Hero() {
         >
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-[8%] rounded-full bg-brand/25 blur-[90px]"
+            className="pointer-events-none absolute inset-[4%] rounded-full bg-brand/30 blur-[100px]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-[6%] rounded-full border border-white/[0.07]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-[22%] hidden rounded-full border border-white/[0.04] sm:block"
           />
 
           <div className="glass glass-lit glass-hover !absolute inset-[10%] grid place-items-center overflow-hidden p-8">

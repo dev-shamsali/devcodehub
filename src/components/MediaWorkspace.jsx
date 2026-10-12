@@ -2,18 +2,17 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Menu, X, Images, ArrowLeft, LogOut, Code2 } from 'lucide-react';
-import { logoutAction } from '@/app/(auth)/actions';
+import { X, Images, ArrowLeft } from 'lucide-react';
+import AppBar from '@/components/AppBar';
 import MediaList from '@/components/MediaList';
 import MediaGallery from '@/components/MediaGallery';
 import Wordmark from '@/components/landing/Wordmark';
-import SocialLinks from '@/components/landing/SocialLinks';
 
 /**
  * Shell for /media. Same two-pane shape as the editor: a sidebar of shares on
  * the left, the selected share on the right, drawer-style on small screens.
  */
-export default function MediaWorkspace() {
+export default function MediaWorkspace({ user }) {
   const [selected, setSelected] = useState({ id: null, name: '' });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   // Bumped by the gallery after an upload or delete so the sidebar refetches
@@ -69,43 +68,7 @@ export default function MediaWorkspace() {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-white/10 bg-ink-900/40 px-4 py-3 backdrop-blur-2xl">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="rounded-full border border-white/10 bg-white/5 p-2 text-text-hi transition-colors hover:bg-white/10 md:hidden"
-            aria-label="Open share list"
-          >
-            <Menu className="h-4 w-4" strokeWidth={1.75} />
-          </button>
-          <Wordmark className="text-[0.9rem] md:hidden" />
-
-          <div className="ml-auto flex items-center gap-3 sm:gap-4">
-            <Link
-              href="/editor"
-              className="inline-flex items-center gap-1.5 text-[0.82rem] text-text-mid transition-colors hover:text-text-hi"
-            >
-              <Code2 className="h-3.5 w-3.5" strokeWidth={1.75} />
-              <span className="hidden sm:inline">Editor</span>
-            </Link>
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1.5 text-[0.82rem] text-text-mid transition-colors hover:text-text-hi"
-              >
-                <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} />
-                <span className="hidden sm:inline">Log out</span>
-              </button>
-            </form>
-            <a
-              href="#about"
-              className="hidden text-[0.82rem] text-text-mid transition-colors hover:text-text-hi sm:block"
-            >
-              About
-            </a>
-            <span aria-hidden="true" className="h-4 w-px bg-white/10" />
-            <SocialLinks />
-          </div>
-        </div>
+        <AppBar user={user} onMenu={() => setIsSidebarOpen(true)} menuLabel="Open share list" />
 
         <div className="min-h-0 flex-1 p-3 sm:p-5">
           {selected.id ? (

@@ -20,13 +20,13 @@ export default function StackStrip() {
   const reduce = useReducedMotion();
 
   return (
-    <section className="edge-top" aria-label="Technology stack">
+    <section aria-label="Technology stack" className="px-5 sm:px-8">
       <motion.div
         initial={reduce ? false : { opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, amount: 0.6 }}
         transition={{ duration: 0.5 }}
-        className="mx-auto flex max-w-[1200px] flex-col items-center gap-7 px-5 py-12 sm:px-8 md:flex-row md:justify-between md:gap-10"
+        className="glass-pill mx-auto flex max-w-[1200px] flex-col items-center gap-6 !rounded-[28px] px-6 py-7 md:flex-row md:justify-between md:gap-10 md:!rounded-full md:px-10"
       >
         <p className="max-w-[22ch] text-center text-[0.82rem] leading-relaxed text-text-lo md:text-left">
           Built on the stack your team already runs.

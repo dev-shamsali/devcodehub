@@ -33,11 +33,11 @@ export default function Faq() {
           <br className="hidden lg:block" /> actually ask.
         </motion.h2>
 
-        <div className="divide-y divide-white/8 border-y border-white/8">
+        <div className="space-y-3">
           {FAQ.map((item, i) => {
             const isOpen = open === i;
             return (
-              <div key={item.q}>
+              <div key={item.q} className="glass px-5 sm:px-6">
                 <h3>
                   <button
                     onClick={() => setOpen(isOpen ? -1 : i)}
@@ -69,7 +69,7 @@ export default function Faq() {
                   className="grid"
                 >
                   <div className="overflow-hidden">
-                    <p className="max-w-[62ch] pb-6 pr-10 text-[0.92rem] leading-relaxed text-text-mid">
+                    <p className="max-w-[62ch] pb-5 pr-8 text-[0.92rem] leading-relaxed text-text-mid">
                       {item.a}
                     </p>
                   </div>

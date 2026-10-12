@@ -100,6 +100,12 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Decorative glows may spill past the viewport; never let them add a horizontal scrollbar. */
+html,
+body {
+  overflow-x: clip;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -137,10 +143,11 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(48rem 36rem at 88% -8%, rgb(61 141 255 / 0.2), transparent 62%),
-    radial-gradient(40rem 32rem at -6% 38%, rgb(42 115 232 / 0.14), transparent 60%),
-    radial-gradient(44rem 30rem at 70% 108%, rgb(61 141 255 / 0.12), transparent 62%),
-    radial-gradient(26rem 20rem at 40% 18%, rgb(120 175 255 / 0.07), transparent 65%);
+    radial-gradient(52rem 38rem at 90% -10%, rgb(47 128 255 / 0.3), transparent 62%),
+    radial-gradient(42rem 34rem at -8% 34%, rgb(42 115 232 / 0.2), transparent 60%),
+    radial-gradient(46rem 32rem at 72% 108%, rgb(47 128 255 / 0.18), transparent 62%),
+    radial-gradient(28rem 22rem at 38% 16%, rgb(150 190 255 / 0.09), transparent 65%),
+    linear-gradient(180deg, #080b12, #05070b);
 }
 
 /*
