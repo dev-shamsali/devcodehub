@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ref, get, remove } from 'firebase/database';
 import { database } from '@/lib/firebase';
 import AppBar from '@/components/AppBar';
@@ -36,28 +36,42 @@ const stamp = (ms) =>
 
 export default function AdminPanel({ user }) {
   const [items, setItems] = useState([]);
-  const [totals, setTotals] = useState({ total: 0, users: 0 });
+  const [totals, setTotals] = useState({ total: 0, users: 0, pages: 1, pageSize: 10 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [action, setAction] = useState('');
   const [query, setQuery] = useState('');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+
+  // Wait for a pause in typing before asking the server, and go back to page 1.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(query.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [query]);
 
   const load = useCallback(async () => {
     try {
-      const qs = new URLSearchParams({ limit: '300' });
+      const qs = new URLSearchParams({ page: String(page) });
       if (action) qs.set('action', action);
+      if (search) qs.set('q', search);
       const res = await fetch(`/api/admin/activity?${qs}`, { cache: 'no-store' });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || 'Could not load the log.');
       setItems(data.items);
-      setTotals({ total: data.total, users: data.users });
+      setTotals({ total: data.total, users: data.users, pages: data.pages, pageSize: data.pageSize });
+      // The server clamps the page if entries expired out from under it.
+      if (data.page !== page) setPage(data.page);
       setError('');
     } catch (e) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
-  }, [action]);
+  }, [action, search, page]);
 
   useEffect(() => {
     // Initial and filter-change fetch; the interval keeps the log live.
@@ -66,14 +80,6 @@ export default function AdminPanel({ user }) {
     const t = setInterval(load, POLL_MS);
     return () => clearInterval(t);
   }, [load]);
-
-  const shown = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((i) =>
-      `${i.name} ${i.email} ${i.targetName} ${LABELS[i.action] || i.action}`.toLowerCase().includes(q)
-    );
-  }, [items, query]);
 
   /* ---- delete all ---- */
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -127,7 +133,7 @@ export default function AdminPanel({ user }) {
             {[
               ['Users', totals.users],
               ['Log entries', totals.total],
-              ['Showing', shown.length],
+              ['Page', `${page} / ${totals.pages}`],
             ].map(([label, value], i) => (
               <div key={label} className={`px-4 py-5 ${i ? 'border-l border-(--line)' : ''}`}>
                 <dt className="text-[0.78rem] text-text-lo">{label}</dt>
@@ -154,7 +160,10 @@ export default function AdminPanel({ user }) {
                 />
                 <select
                   value={action}
-                  onChange={(e) => setAction(e.target.value)}
+                  onChange={(e) => {
+                    setAction(e.target.value);
+                    setPage(1);
+                  }}
                   aria-label="Filter by action"
                   className="border border-(--line) bg-(--paper) px-3 py-2 text-[0.85rem] text-(--ink) outline-none focus:border-(--accent)"
                 >
@@ -174,7 +183,7 @@ export default function AdminPanel({ user }) {
               </div>
             </div>
 
-            <p className="mt-2 text-[0.78rem] text-text-lo">Times are India Standard Time. Updates every 15 seconds.</p>
+            <p className="mt-2 text-[0.78rem] text-text-lo">Times are India Standard Time. Updates every 15 seconds. Entries are kept for 5 days, then deleted.</p>
 
             {error && (
               <p role="alert" className="mt-4 border-l-2 border-danger pl-3 text-[0.9rem] text-danger">
@@ -193,11 +202,11 @@ export default function AdminPanel({ user }) {
 
               {loading ? (
                 <p className="px-4 py-10 text-center text-[0.9rem] text-text-lo">Loading...</p>
-              ) : shown.length === 0 ? (
+              ) : items.length === 0 ? (
                 <p className="px-4 py-10 text-center text-[0.9rem] text-text-lo">No activity yet.</p>
               ) : (
                 <ul className="divide-y divide-(--line)">
-                  {shown.map((i) => (
+                  {items.map((i) => (
                     <li
                       key={i.id}
                       className="grid gap-x-4 gap-y-1 px-4 py-3 text-[0.88rem] md:grid-cols-[9.5rem_1fr_1.2fr_11rem_1fr] md:items-center"
@@ -214,6 +223,35 @@ export default function AdminPanel({ user }) {
                 </ul>
               )}
             </div>
+
+            <nav aria-label="Activity log pages" className="mt-4 flex items-center justify-between gap-4">
+              <p className="text-[0.82rem] text-text-lo">
+                {totals.total === 0
+                  ? '0 entries'
+                  : `${(page - 1) * totals.pageSize + 1}-${Math.min(page * totals.pageSize, totals.total)} of ${totals.total}`}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                  disabled={page <= 1}
+                  aria-label="Previous 10 entries"
+                  className="border border-(--line) px-4 py-2 text-[1.1rem] leading-none transition-colors hover:border-(--ink) disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-(--line)"
+                >
+                  &lt;
+                </button>
+                <span className="min-w-[5.5rem] text-center font-mono text-[0.82rem]">
+                  {page} / {totals.pages}
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(p + 1, totals.pages))}
+                  disabled={page >= totals.pages}
+                  aria-label="Next 10 entries"
+                  className="border border-(--line) px-4 py-2 text-[1.1rem] leading-none transition-colors hover:border-(--ink) disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-(--line)"
+                >
+                  &gt;
+                </button>
+              </div>
+            </nav>
           </section>
 
           {/* Danger zone */}

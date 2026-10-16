@@ -11,16 +11,17 @@ export async function GET(request) {
   if (gate.response) return gate.response;
 
   const { searchParams } = new URL(request.url);
-  const limit = Number.parseInt(searchParams.get('limit') || '200', 10) || 200;
+  const page = Number.parseInt(searchParams.get('page') || '1', 10) || 1;
   const action = searchParams.get('action') || '';
+  const q = searchParams.get('q') || '';
 
   try {
-    const [{ items, total }, users] = await Promise.all([
-      listActivity({ limit, action }),
+    const [log, users] = await Promise.all([
+      listActivity({ page, pageSize: 10, action, q }),
       getDb().then((db) => db.collection('users').estimatedDocumentCount()),
     ]);
     return NextResponse.json(
-      { ok: true, items, total, users },
+      { ok: true, ...log, users },
       { headers: { 'Cache-Control': 'no-store' } }
     );
   } catch (error) {
