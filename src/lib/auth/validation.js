@@ -38,7 +38,7 @@ export function validateName(name) {
 }
 
 /** Only same-site relative paths, so ?next= cannot become an open redirect. */
-export function safeNext(value, fallback = '/editor') {
+export function safeNext(value, fallback = '/after-login') {
   if (typeof value !== 'string') return fallback;
   if (!value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
   return value;

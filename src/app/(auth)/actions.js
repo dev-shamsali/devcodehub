@@ -21,6 +21,8 @@ import {
   recordAttempt,
 } from '@/lib/auth/db';
 import { sendResetEmail, sendGoogleOnlyEmail } from '@/lib/auth/mail';
+import { isAdminEmail } from '@/lib/auth/admin';
+import { logActivity } from '@/lib/activity';
 
 const BCRYPT_COST = 12;
 const TOO_MANY = 'Too many attempts. Wait 15 minutes and try again.';
@@ -62,6 +64,11 @@ export async function signupAction(_prev, formData) {
   const invalid = validateName(name) || validateEmail(email) || validatePassword(password);
   if (invalid) return { error: invalid };
 
+  // Admin addresses sign in with Google, so a password account can never claim one.
+  if (isAdminEmail(email)) {
+    return { error: 'This address signs in with Google. Use Continue with Google.' };
+  }
+
   const limitKey = `signup:${await ip()}`;
   if (await isLimited(limitKey, 10)) return { error: TOO_MANY };
   await recordAttempt(limitKey);
@@ -72,7 +79,8 @@ export async function signupAction(_prev, formData) {
 
   const passwordHash = await bcrypt.hash(password, BCRYPT_COST);
   try {
-    await createUser({ email, name, passwordHash });
+    const created = await createUser({ email, name, passwordHash });
+    await logActivity({ user: { id: created._id, name, email }, action: 'signup' });
   } catch (error) {
     if (error?.code === 11000) {
       return { error: 'An account with this email already exists. Log in instead.' };

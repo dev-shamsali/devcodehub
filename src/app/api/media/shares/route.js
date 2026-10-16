@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/auth/guard';
+import { logActivity } from '@/lib/activity';
 import { containsProfanity, PROFANITY_MESSAGE } from '@/lib/profanity';
 import { getShares, isConfigured, describeDbError } from '@/lib/mongodb';
 
@@ -94,6 +95,7 @@ export async function POST(request) {
     };
 
     await shares.insertOne(doc);
+    await logActivity({ user: gate.user, action: 'share.create', targetId: shareId, targetName: doc.name });
     return NextResponse.json({ ok: true, share: toClient(doc) }, { status: 201 });
   } catch (error) {
     console.error('Create share failed:', error);

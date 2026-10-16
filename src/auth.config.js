@@ -1,5 +1,6 @@
 import { encode } from 'next-auth/jwt';
 import { sessionExpiry, isExpired, SESSION_SECONDS } from '@/lib/auth/expiry';
+import { isAdminEmail } from '@/lib/auth/admin';
 
 /**
  * Config shared by the proxy and the full server config. It must not import
@@ -37,6 +38,8 @@ export const authConfig = {
     },
     session({ session, token }) {
       if (token?.id) session.user.id = token.id;
+      // Admin = verified at sign-in AND still on the ADMIN_EMAILS list today.
+      session.user.role = token?.admin && isAdminEmail(token.email) ? 'admin' : 'user';
       session.expiresAt = token.expiresAt;
       // Auth.js derives `expires` from maxAge; report the real cutoff.
       session.expires = new Date(token.expiresAt).toISOString();
@@ -45,7 +48,13 @@ export const authConfig = {
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
       const loggedIn = Boolean(auth?.user);
-      if (pathname.startsWith('/media') || pathname.startsWith('/editor')) return loggedIn;
+      if (
+        pathname.startsWith('/media') ||
+        pathname.startsWith('/editor') ||
+        pathname.startsWith('/admin')
+      ) {
+        return loggedIn;
+      }
       return true;
     },
   },

@@ -145,3 +145,10 @@ require a session; the editor records who created and last edited each snippet.
 5. `npm run build && npm start`.
 
 Checks: `npm run lint`, `npm run test:unit`, `npm run test:e2e`.
+
+### Admin
+
+Set `ADMIN_EMAILS` (comma separated) in `.env`. An admin signs in with Google
+through the normal login page and lands on `/admin`, which shows the activity
+log (who did what, when, with their email) and the "Delete all codes" action.
+Password accounts can never be admin: signup is refused for admin addresses.

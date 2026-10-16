@@ -23,6 +23,7 @@ export default async function EditorPage() {
   const user = {
     id: session.user.id,
     name: session.user.name || session.user.email || 'Unknown',
+    role: session.user.role,
   };
 
   return (

@@ -98,7 +98,7 @@ const mediaJsonLd = {
 export default async function MediaRoute() {
   const session = await auth();
   const user = session?.user
-    ? { id: session.user.id, name: session.user.name || session.user.email || '' }
+    ? { id: session.user.id, name: session.user.name || session.user.email || '', role: session.user.role }
     : null;
 
   return (

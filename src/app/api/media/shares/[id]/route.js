@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/auth/guard';
+import { logActivity } from '@/lib/activity';
 import { containsProfanity, PROFANITY_MESSAGE } from '@/lib/profanity';
 import { getShares, isConfigured, describeDbError } from '@/lib/mongodb';
 
@@ -113,6 +114,12 @@ export async function DELETE(request, { params }) {
     // Hand back the file ids so the caller can release the bytes on ImageKit.
     const doc = await shares.findOneAndDelete({ shareId: id });
     const removed = doc?.files || doc?.value?.files || [];
+    await logActivity({
+      user: gate.user,
+      action: 'share.delete',
+      targetId: id,
+      targetName: doc?.name || doc?.value?.name || '',
+    });
     return NextResponse.json({ ok: true, fileIds: removed.map((f) => f.fileId).filter(Boolean) });
   } catch (error) {
     console.error('Delete share failed:', error);

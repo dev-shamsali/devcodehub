@@ -3,6 +3,8 @@ import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { authConfig } from '@/auth.config';
+import { isAdminEmail } from '@/lib/auth/admin';
+import { logActivity } from '@/lib/activity';
 import { normalizeEmail, validateEmail } from '@/lib/auth/validation';
 import {
   findUserByEmail,
@@ -49,7 +51,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
         await clearAttempts(key);
-        return { id: String(user._id), email: user.email, name: user.name };
+        const signedIn = {
+          id: String(user._id),
+          email: user.email,
+          name: user.name,
+          emailVerified: user.emailVerified === true,
+        };
+        await logActivity({ user: signedIn, action: 'login' });
+        return signedIn;
       },
     }),
   ],
@@ -66,10 +75,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: profile.name || profile.email,
           googleId: profile.sub,
         });
-        user = { id: String(dbUser._id), email: dbUser.email, name: dbUser.name };
+        user = { id: String(dbUser._id), email: dbUser.email, name: dbUser.name, emailVerified: true };
+        await logActivity({ user, action: 'login' });
         token.name = dbUser.name;
         token.email = dbUser.email;
       }
+      // Sign-in only: admin needs an address on the list AND a verified email.
+      if (user) token.admin = isAdminEmail(user.email) && user.emailVerified === true;
       return authConfig.callbacks.jwt({ token, user, account, profile, ...rest });
     },
   },

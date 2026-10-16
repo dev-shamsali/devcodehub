@@ -13,6 +13,7 @@ import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language'
 
 import { Copy, Check, Loader2, Wifi, WifiOff } from 'lucide-react';
 import { AUTHOR } from '@/lib/site';
+import { trackActivity } from '@/lib/trackActivity';
 
 export default function CodeEditor({ noteId, user }) {
   const editorContainerRef = useRef(null);
@@ -32,6 +33,8 @@ export default function CodeEditor({ noteId, user }) {
   const [dark, setDark] = useState(false);
   const [meta, setMeta] = useState({ createdBy: '', lastEditedBy: '', lastModified: 0 });
   // Read inside the CodeMirror listener, which is created once per note.
+  const lastTracked = useRef(0);
+  const noteNameRef = useRef('');
   const userRef = useRef(user);
   useEffect(() => {
     userRef.current = user;
@@ -83,6 +86,12 @@ export default function CodeEditor({ noteId, user }) {
           if (isRemoteUpdate.current) return;
 
           setIsSaving(true);
+          // Reported at most once a minute here; the server keeps one entry per 10 minutes.
+          const nowTs = Date.now();
+          if (nowTs - lastTracked.current > 60_000) {
+            lastTracked.current = nowTs;
+            trackActivity('note.edit', noteId, noteNameRef.current);
+          }
           update(noteRef, {
             content: updateEvent.state.doc.toString(),
             lastModified: Date.now(),
@@ -103,6 +112,7 @@ export default function CodeEditor({ noteId, user }) {
       (snapshot) => {
         setIsConnected(true);
         const val = snapshot.val() || {};
+        noteNameRef.current = val.name || '';
         setMeta({
           createdBy: val.createdBy || '',
           lastEditedBy: val.lastEditedBy || '',

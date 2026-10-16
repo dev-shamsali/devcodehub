@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test:unit": "node --test tests/expiry.test.mjs tests/profanity.test.mjs",
+    "test:unit": "node --test tests/expiry.test.mjs tests/profanity.test.mjs tests/admin.test.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {

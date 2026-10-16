@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, Fragment } from 'react';
 import { database } from '../lib/firebase';
 import { containsProfanity, maskProfanity, PROFANITY_MESSAGE } from '@/lib/profanity';
+import { trackActivity } from '@/lib/trackActivity';
 import { ref, onValue, set, update, child } from 'firebase/database';
 import {
   Search,
@@ -25,7 +26,7 @@ import {
 
 const THIRTY_SIX_HOURS_MS = 36 * 60 * 60 * 1000;
 
-export default function NoteList({ onSelect, onDelete, user }) {
+export default function NoteList({ onSelect, onDelete, user, selectedId }) {
   const [notes, setNotes] = useState([]);
   const [newNoteName, setNewNoteName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -90,11 +91,6 @@ export default function NoteList({ onSelect, onDelete, user }) {
     onConfirm: null,
   });
 
-  // Master delete modal
-  const [masterModalOpen, setMasterModalOpen] = useState(false);
-  const [masterValue, setMasterValue] = useState('');
-  const [masterError, setMasterError] = useState('');
-  const [masterChecking, setMasterChecking] = useState(false);
 
   // Relative timestamps need a clock, but reading Date.now() during render is
   // impure and desyncs on re-render. Sample it on an interval instead.
@@ -259,6 +255,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
         locked: false,
         pinCode: '',
       });
+      trackActivity('note.create', id, trimmed);
       setNewNoteName('');
     } catch (err) {
       console.error(err);
@@ -293,6 +290,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
         lastEditedBy: user?.name || '',
         lastEditedById: user?.id || '',
       });
+      trackActivity('note.pin', note.id, note.name);
     } catch (e) {
       console.error('Toggle pin failed:', e);
     }
@@ -318,6 +316,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
         lastEditedBy: user?.name || '',
         lastEditedById: user?.id || '',
       }).catch((e) => console.error(e));
+      trackActivity('note.unlock', note.id, note.name);
       return;
     }
     setPinModal({
@@ -375,7 +374,10 @@ export default function NoteList({ onSelect, onDelete, user }) {
     });
     try {
       await update(ref(database, 'notes'), updates);
-      ids.forEach((id) => onDelete?.(id));
+      ids.forEach((id) => {
+        trackActivity('note.delete', id, findNote(id)?.name || '');
+        onDelete?.(id);
+      });
       setSelectedIds((prev) => {
         const next = new Set(prev);
         ids.forEach((id) => next.delete(id));
@@ -404,36 +406,6 @@ export default function NoteList({ onSelect, onDelete, user }) {
     });
   };
 
-  const openMasterDeleteModal = () => {
-    if (!notes.length) return;
-    setMasterValue('');
-    setMasterError('');
-    setMasterModalOpen(true);
-  };
-
-  const confirmMasterDelete = async () => {
-    setMasterError('');
-    setMasterChecking(true);
-    try {
-      const res = await fetch('/api/master-delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: masterValue }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.ok) {
-        setMasterError(data.error || 'Incorrect master password.');
-        return;
-      }
-      await deleteNotes(notes.map((n) => n.id));
-      setMasterModalOpen(false);
-    } catch {
-      setMasterError('Could not reach the server. Try again.');
-    } finally {
-      setMasterChecking(false);
-    }
-  };
-
   /* -------------------- PIN MODAL CONFIRM -------------------- */
 
   const handlePinModalConfirm = async () => {
@@ -460,6 +432,8 @@ export default function NoteList({ onSelect, onDelete, user }) {
         lastEditedBy: user?.name || '',
         lastEditedById: user?.id || '',
         });
+        trackActivity('note.lock', noteId, note.name);
+        trackActivity('note.lock', noteId, note.name);
         setPinModal({ open: false, action: null, noteId: null });
       }
 
@@ -475,6 +449,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
         lastEditedBy: user?.name || '',
         lastEditedById: user?.id || '',
         });
+        trackActivity('note.unlock', noteId, note.name);
         setPinModal({ open: false, action: null, noteId: null });
       }
 
@@ -577,14 +552,6 @@ export default function NoteList({ onSelect, onDelete, user }) {
             >
               Delete selected
             </motion.button>
-            <motion.button
-              whileTap={tapScale}
-              onClick={openMasterDeleteModal}
-              disabled={!notes.length}
-              className="px-3 py-1.5 rounded-full btn-danger text-white text-xs font-semibold"
-            >
-              Delete all
-            </motion.button>
           </div>
         </div>
 
@@ -609,7 +576,12 @@ export default function NoteList({ onSelect, onDelete, user }) {
                   animate="animate"
                   exit="exit"
                   transition={listItemTransition}
-                  className="flex min-w-0 items-center justify-between rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2.5 transition-colors hover:border-white/20 hover:bg-white/[0.07]"
+                  aria-current={note.id === selectedId ? 'true' : undefined}
+                  className={`flex min-w-0 items-center justify-between rounded-[12px] border px-3 py-2.5 transition-colors ${
+                    note.id === selectedId
+                      ? 'border-brand bg-brand/10 shadow-[inset_3px_0_0_var(--accent)]'
+                      : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+                  }`}
                 >
                   {/* Checkbox */}
                   <input
@@ -939,85 +911,6 @@ export default function NoteList({ onSelect, onDelete, user }) {
       </Transition>
 
       {/* MASTER DELETE MODAL */}
-      <Transition appear show={masterModalOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-50"
-          onClose={() => setMasterModalOpen(false)}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-100"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-ink-900/70 backdrop-blur-sm" />
-          </Transition.Child>
-          <div className="fixed inset-0 flex items-center justify-center p-4">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-[cubic-bezier(0.16,1,0.3,1)] duration-200"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-100"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <Dialog.Panel className="glass w-full max-w-xs p-4">
-                <Dialog.Title className="text-sm font-semibold text-danger">
-                  Delete ALL codes
-                </Dialog.Title>
-                <p className="text-[11px] text-text-mid mt-1">
-                  This will delete <b>all</b> codes including pinned and locked.
-                  Enter master password to continue.
-                </p>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (!masterChecking) confirmMasterDelete();
-                  }}
-                >
-                <input
-                  type="password"
-                  value={masterValue}
-                  onChange={(e) => {
-                    setMasterValue(e.target.value);
-                    setMasterError('');
-                  }}
-                  className="mt-2 w-full rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
-                  placeholder="Master password"
-                  autoFocus
-                />
-                {masterError && (
-                  <p className="text-[10px] text-danger mt-1">
-                    {masterError}
-                  </p>
-                )}
-                <div className="mt-3 flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setMasterModalOpen(false)}
-                    className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10] active:scale-95 transition-transform duration-100"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={masterChecking}
-                    className="px-3 py-1 text-xs rounded-full btn-primary text-white disabled:opacity-60 active:scale-95 transition-transform duration-100"
-                  >
-                    {masterChecking ? 'Checking...' : 'Delete all'}
-                  </button>
-                </div>
-                </form>
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
-        </Dialog>
-      </Transition>
     </>
   );
 }

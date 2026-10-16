@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Code2, Images, LogOut } from 'lucide-react';
+import { Menu, Code2, Images, LogOut, ShieldCheck } from 'lucide-react';
 import { logoutAction } from '@/app/(auth)/actions';
 import SocialLinks from '@/components/landing/SocialLinks';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -11,6 +11,7 @@ const TABS = [
   { href: '/editor', label: 'Codes', icon: Code2 },
   { href: '/media', label: 'Media', icon: Images },
 ];
+const ADMIN_TAB = { href: '/admin', label: 'Admin', icon: ShieldCheck };
 
 /**
  * Top bar shared by the editor and the media page. Left: who is signed in and
@@ -47,7 +48,7 @@ export default function AppBar({ user, onMenu, menuLabel = 'Open list' }) {
       </div>
 
       <nav aria-label="Workspace" className="ml-auto flex h-[52px] shrink-0 items-stretch">
-        {TABS.map(({ href, label, icon: Icon }) => {
+        {(user?.role === 'admin' ? [...TABS, ADMIN_TAB] : TABS).map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
           return (
             <Link
