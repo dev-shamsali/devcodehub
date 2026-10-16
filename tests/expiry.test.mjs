@@ -1,30 +1,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { nextMidnightIST, isExpired } from '../src/lib/auth/expiry.js';
+import { sessionExpiry, isExpired, SESSION_DAYS } from '../src/lib/auth/expiry.js';
 
-const IST = 5.5 * 3600 * 1000;
-const at = (iso) => Date.parse(iso);
+const DAY = 24 * 60 * 60 * 1000;
 
-test('afternoon IST rolls to the next IST midnight', () => {
-  // 2026-10-12 15:00 IST = 09:30Z
-  assert.equal(nextMidnightIST(at('2026-10-12T09:30:00Z')), at('2026-10-12T18:30:00Z'));
+test('a session lasts exactly 45 days from sign-in', () => {
+  assert.equal(SESSION_DAYS, 45);
+  assert.equal(sessionExpiry(1_000_000), 1_000_000 + 45 * DAY);
 });
 
-test('one second before midnight IST still ends at that midnight', () => {
-  assert.equal(nextMidnightIST(at('2026-10-12T18:29:59Z')), at('2026-10-12T18:30:00Z'));
+test('still valid on day 44, over on day 45', () => {
+  const start = Date.parse('2026-10-16T08:00:00Z');
+  const end = sessionExpiry(start);
+  assert.equal(isExpired(end, start + 44 * DAY), false);
+  assert.equal(isExpired(end, start + 45 * DAY), true);
 });
 
-test('exactly midnight IST rolls a full day', () => {
-  assert.equal(nextMidnightIST(at('2026-10-12T18:30:00Z')), at('2026-10-13T18:30:00Z'));
-});
-
-test('result is always 00:00 IST', () => {
-  const t = nextMidnightIST(Date.now());
-  assert.equal((t + IST) % 86400000, 0);
-});
-
-test('isExpired', () => {
-  assert.equal(isExpired(1000, 1000), true);
-  assert.equal(isExpired(1000, 999), false);
+test('missing or malformed cutoff counts as expired', () => {
   assert.equal(isExpired(undefined, 0), true);
+  assert.equal(isExpired('later', 0), true);
 });

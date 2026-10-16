@@ -132,8 +132,8 @@ Your GitHub project will now look professional and clear for sharing, showcasing
 ## Authentication and deployment
 
 Accounts live in MongoDB. Sign in with email and password or with Google
-(Auth.js v5). A session ends at the next midnight in India Standard Time
-(UTC+05:30), whenever the user logged in. `/editor`, `/media` and `/api/media/*`
+(Auth.js v5). A login lasts 45 days from sign-in, or until the user logs out
+(no sliding window). `/editor`, `/media` and `/api/media/*`
 require a session; the editor records who created and last edited each snippet.
 
 1. Copy `.env.example` to `.env` and fill every value.

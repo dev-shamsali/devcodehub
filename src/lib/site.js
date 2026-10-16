@@ -51,7 +51,7 @@ export const FAQ = [
   },
   {
     q: 'Do I need an account to use DevCodeHub?',
-    a: 'Yes. Sign up with an email and password or with Google. You stay signed in until midnight India time, then log in again.',
+    a: 'Yes. Sign up with an email and password or with Google. You stay signed in for 45 days after you log in, or until you log out.',
   },
   {
     q: 'Which files can I share?',

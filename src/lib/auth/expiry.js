@@ -1,17 +1,15 @@
 /**
- * Sessions end at the next midnight in India Standard Time.
- *
- * IST is a fixed UTC+05:30 with no daylight saving, so the offset can be
- * applied as plain arithmetic instead of pulling in a timezone library.
+ * A login lasts 45 days, or until the user logs out. There is no sliding
+ * window: the cutoff is fixed at sign-in, so a stolen cookie cannot stay
+ * valid forever by being used.
  */
 
-const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
-const DAY_MS = 24 * 60 * 60 * 1000;
+export const SESSION_DAYS = 45;
+export const SESSION_SECONDS = SESSION_DAYS * 24 * 60 * 60;
 
-/** Epoch ms of the next 00:00 IST strictly after `now`. */
-export function nextMidnightIST(now = Date.now()) {
-  const istDay = Math.floor((now + IST_OFFSET_MS) / DAY_MS);
-  return (istDay + 1) * DAY_MS - IST_OFFSET_MS;
+/** Epoch ms at which a session started at `now` ends. */
+export function sessionExpiry(now = Date.now()) {
+  return now + SESSION_SECONDS * 1000;
 }
 
 export function isExpired(expiresAt, now = Date.now()) {

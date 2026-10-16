@@ -1,5 +1,5 @@
 import { encode } from 'next-auth/jwt';
-import { nextMidnightIST, isExpired } from '@/lib/auth/expiry';
+import { sessionExpiry, isExpired, SESSION_SECONDS } from '@/lib/auth/expiry';
 
 /**
  * Config shared by the proxy and the full server config. It must not import
@@ -9,12 +9,13 @@ export const authConfig = {
   pages: { signIn: '/login' },
   session: {
     strategy: 'jwt',
-    // Upper bound only. The real end of a session is `expiresAt` below.
-    maxAge: 24 * 60 * 60,
-    updateAge: 24 * 60 * 60,
+    // 45 days. The cookie lasts as long as the token; `expiresAt` is the hard cutoff.
+    maxAge: SESSION_SECONDS,
+    // Never re-issue early: the 45 days run from the login, not from the last visit.
+    updateAge: SESSION_SECONDS,
   },
   jwt: {
-    // Pin the JWT's own `exp` to the midnight cutoff. Without this, every
+    // Pin the JWT's own `exp` to the sign-in cutoff. Without this, every
     // re-issue would push the expiry a full maxAge into the future.
     async encode(params) {
       const expiresAt = params.token?.expiresAt;
@@ -28,7 +29,7 @@ export const authConfig = {
       // `user` is only present on the request that signs in.
       if (user) {
         token.id = user.id;
-        token.expiresAt = nextMidnightIST();
+        token.expiresAt = sessionExpiry();
       }
       // Returning null clears the cookie: the session is over.
       if (isExpired(token.expiresAt)) return null;

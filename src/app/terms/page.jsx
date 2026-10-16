@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalPage title="Terms of Use" updated="12 October 2026">
+    <LegalPage title="Terms of Use" updated="16 October 2026">
       <section>
         <p>
           By creating an account or using {SITE.name} you agree to these terms. If you do not
@@ -22,7 +22,7 @@ export default function TermsPage() {
         <ul>
           <li>Give accurate details and keep your login private. You are responsible for what happens under your account.</li>
           <li>Your name is shown to other users as the creator or last editor of snippets.</li>
-          <li>Sessions end at midnight India Standard Time, so you will need to log in again each day.</li>
+          <li>You stay signed in for 45 days after you log in, or until you log out.</li>
         </ul>
       </section>
 

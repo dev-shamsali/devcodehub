@@ -407,6 +407,7 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
                   </button>
                   <button
                     onClick={deleteShare}
+                    autoFocus
                     className="rounded btn-primary px-3 py-1 text-xs text-white transition-colors"
                   >
                     Delete

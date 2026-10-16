@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'motion/react';
 const MOVES = [
   {
     verb: 'Sign in',
-    body: 'Create an account or continue with Google. You stay signed in until midnight India time.',
+    body: 'Create an account or continue with Google. You stay signed in for 45 days, or until you log out.',
   },
   {
     verb: 'Create it',

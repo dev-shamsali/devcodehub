@@ -817,6 +817,12 @@ export default function NoteList({ onSelect, onDelete, user }) {
                     ? 'Leave empty to lock without PIN, or enter a 4-digit PIN.'
                     : 'Enter the 4-digit PIN for this code.'}
                 </p>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handlePinModalConfirm();
+                  }}
+                >
                 <input
                   type="password"
                   value={pinValue}
@@ -835,6 +841,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                 )}
                 <div className="mt-3 flex justify-end gap-2">
                   <button
+                    type="button"
                     onClick={() =>
                       setPinModal({
                         open: false,
@@ -847,12 +854,13 @@ export default function NoteList({ onSelect, onDelete, user }) {
                     Cancel
                   </button>
                   <button
-                    onClick={handlePinModalConfirm}
+                    type="submit"
                     className="px-3 py-1 text-xs rounded-full btn-primary text-white active:scale-95 transition-transform duration-100"
                   >
                     Confirm
                   </button>
                 </div>
+                </form>
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -918,6 +926,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                         onConfirm: null,
                       });
                     }}
+                    autoFocus
                     className="px-3 py-1 text-xs rounded-full btn-primary text-white active:scale-95 transition-transform duration-100"
                   >
                     Yes
@@ -965,6 +974,12 @@ export default function NoteList({ onSelect, onDelete, user }) {
                   This will delete <b>all</b> codes including pinned and locked.
                   Enter master password to continue.
                 </p>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!masterChecking) confirmMasterDelete();
+                  }}
+                >
                 <input
                   type="password"
                   value={masterValue}
@@ -974,6 +989,7 @@ export default function NoteList({ onSelect, onDelete, user }) {
                   }}
                   className="mt-2 w-full rounded-[12px] border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-text-hi placeholder:text-text-lo focus:border-brand/40 focus:ring-2 focus:ring-brand/30 outline-none"
                   placeholder="Master password"
+                  autoFocus
                 />
                 {masterError && (
                   <p className="text-[10px] text-danger mt-1">
@@ -982,19 +998,21 @@ export default function NoteList({ onSelect, onDelete, user }) {
                 )}
                 <div className="mt-3 flex justify-end gap-2">
                   <button
+                    type="button"
                     onClick={() => setMasterModalOpen(false)}
                     className="px-2 py-1 text-xs rounded bg-white/[0.06] hover:bg-white/[0.10] active:scale-95 transition-transform duration-100"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={confirmMasterDelete}
+                    type="submit"
                     disabled={masterChecking}
                     className="px-3 py-1 text-xs rounded-full btn-primary text-white disabled:opacity-60 active:scale-95 transition-transform duration-100"
                   >
                     {masterChecking ? 'Checking...' : 'Delete all'}
                   </button>
                 </div>
+                </form>
               </Dialog.Panel>
             </Transition.Child>
           </div>
