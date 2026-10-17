@@ -58,11 +58,19 @@ export function describeDbError(error) {
   return null;
 }
 
+let sharesIndexes = null;
+
 export async function getShares() {
   const db = await getDb();
   const shares = db.collection('mediaShares');
-  // Lookups are always by shareId, and the list is sorted by recency.
-  await shares.createIndex({ shareId: 1 }, { unique: true }).catch(() => {});
-  await shares.createIndex({ pinned: -1, updatedAt: -1 }).catch(() => {});
+  // Indexes only need creating once per server instance, not on every request.
+  sharesIndexes ??= Promise.all([
+    // Lookups are always by shareId, and the list is sorted by recency.
+    shares.createIndex({ shareId: 1 }, { unique: true }),
+    shares.createIndex({ pinned: -1, updatedAt: -1 }),
+  ]).catch(() => {
+    sharesIndexes = null;
+  });
+  await sharesIndexes;
   return shares;
 }

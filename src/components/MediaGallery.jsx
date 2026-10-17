@@ -36,7 +36,7 @@ import { gridItemVariants, gridItemTransition, tapScale } from '@/lib/motion';
  * MongoDB cannot push to the browser, so the file list is polled and also
  * refetched right after any local mutation.
  */
-const POLL_MS = 6000;
+const POLL_MS = 12_000;
 
 export default function MediaGallery({ shareId, shareName, onChanged }) {
   const [files, setFiles] = useState([]);
@@ -76,11 +76,19 @@ export default function MediaGallery({ shareId, shareName, onChanged }) {
         .finally(() => alive && setLoading(false));
 
     tick();
-    const poll = setInterval(tick, POLL_MS);
+    // Only poll while the tab is on screen, and catch up the moment it returns.
+    const poll = setInterval(() => {
+      if (document.visibilityState === 'visible') tick();
+    }, POLL_MS);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') tick();
+    };
+    document.addEventListener('visibilitychange', onVisible);
 
     return () => {
       alive = false;
       clearInterval(poll);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [fetchFiles]);
 

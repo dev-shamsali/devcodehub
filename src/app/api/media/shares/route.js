@@ -7,6 +7,7 @@ import { getShares, isConfigured, describeDbError } from '@/lib/mongodb';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+let lastSweep = 0;
 const THIRTY_SIX_HOURS_MS = 36 * 60 * 60 * 1000;
 
 const notConfigured = () =>
@@ -39,10 +40,14 @@ export async function GET() {
     // Unpinned shares expire 36 hours after their last change, matching the
     // snippet side. Swept on read rather than with a TTL index, because a TTL
     // index cannot be made conditional on `pinned`.
-    await shares.deleteMany({
-      pinned: { $ne: true },
-      updatedAt: { $lt: new Date(Date.now() - THIRTY_SIX_HOURS_MS) },
-    });
+    // Sweep at most once a minute per server instance instead of on every poll.
+    if (Date.now() - lastSweep > 60_000) {
+      lastSweep = Date.now();
+      await shares.deleteMany({
+        pinned: { $ne: true },
+        updatedAt: { $lt: new Date(Date.now() - THIRTY_SIX_HOURS_MS) },
+      });
+    }
 
     const docs = await shares
       .find({}, { projection: { 'files.filePath': 0 } })

@@ -21,7 +21,7 @@ const LABELS = {
 };
 
 const DANGER = new Set(['note.delete', 'share.delete', 'admin.delete_all']);
-const POLL_MS = 15_000;
+const POLL_MS = 30_000;
 
 const stamp = (ms) =>
   new Date(ms).toLocaleString('en-IN', {
@@ -77,7 +77,9 @@ export default function AdminPanel({ user }) {
     // Initial and filter-change fetch; the interval keeps the log live.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
-    const t = setInterval(load, POLL_MS);
+    const t = setInterval(() => {
+      if (document.visibilityState === 'visible') load();
+    }, POLL_MS);
     return () => clearInterval(t);
   }, [load]);
 
@@ -183,7 +185,7 @@ export default function AdminPanel({ user }) {
               </div>
             </div>
 
-            <p className="mt-2 text-[0.78rem] text-text-lo">Times are India Standard Time. Updates every 15 seconds. Entries are kept for 5 days, then deleted.</p>
+            <p className="mt-2 text-[0.78rem] text-text-lo">Times are India Standard Time. Updates every 30 seconds. Entries are kept for 5 days, then deleted.</p>
 
             {error && (
               <p role="alert" className="mt-4 border-l-2 border-danger pl-3 text-[0.9rem] text-danger">

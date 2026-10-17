@@ -21,7 +21,7 @@ import {
  * mutation so the local view never lags behind an action the user just took.
  */
 
-const POLL_MS = 6000;
+const POLL_MS = 20_000;
 
 export default function MediaList({ selectedId, onSelect, refreshToken }) {
   const [shares, setShares] = useState([]);
@@ -109,13 +109,21 @@ export default function MediaList({ selectedId, onSelect, refreshToken }) {
         .finally(() => alive && setLoading(false));
 
     tick();
-    const poll = setInterval(tick, POLL_MS);
+    // Only poll while the tab is on screen, and catch up the moment it returns.
+    const poll = setInterval(() => {
+      if (document.visibilityState === 'visible') tick();
+    }, POLL_MS);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') tick();
+    };
+    document.addEventListener('visibilitychange', onVisible);
     const clock = setInterval(() => setNow(Date.now()), 60_000);
 
     return () => {
       alive = false;
       clearInterval(poll);
       clearInterval(clock);
+      document.removeEventListener('visibilitychange', onVisible);
     };
     // refreshToken is a deliberate trigger: the gallery bumps it after an
     // upload or delete so counts refresh without waiting out the poll.
