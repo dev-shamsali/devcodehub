@@ -152,3 +152,15 @@ Set `ADMIN_EMAILS` (comma separated) in `.env`. An admin signs in with Google
 through the normal login page and lands on `/admin`, which shows the activity
 log (who did what, when, with their email) and the "Delete all codes" action.
 Password accounts can never be admin: signup is refused for admin addresses.
+
+### Running behind nginx
+
+Forward the original host and scheme, or sign-in cookies and redirects break:
+
+```
+proxy_set_header Host $host;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-For $remote_addr;
+```
+
+Set `AUTH_URL` to the public origin (for example `https://devcodehub.cloud`).

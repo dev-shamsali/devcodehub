@@ -7,6 +7,11 @@ import { isAdminEmail } from '@/lib/auth/admin';
  * the database, so the proxy stays light and never opens a Mongo connection.
  */
 export const authConfig = {
+  // Required in production behind a reverse proxy (nginx). The proxy.js instance
+  // is built from this config, so it must be set here, not only in src/auth.js;
+  // without it every session lookup there fails with UntrustedHost and a signed-in
+  // user is bounced back to /login.
+  trustHost: true,
   pages: { signIn: '/login' },
   session: {
     strategy: 'jwt',
