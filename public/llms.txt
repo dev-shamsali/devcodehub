@@ -12,7 +12,7 @@ working in Next.js and React. It is his own project, maintained solo.
 - URL: https://devcodehub.cloud
 - Developer: Shams Ali Shaikh (https://github.com/dev-shamsali, https://www.linkedin.com/in/shams-ali-shaikh-27194425a/)
 - Price: free, no paid tier
-- Account required: yes, email and password or Google; a login lasts 45 days or until logout
+- Account required: yes, email and password or Google; you stay signed in until you log out
 - Files: images, zip archives, PDFs and Word documents, delivered through ImageKit, 25 MB per file
 - Retention: unpinned shares clear after 36 hours, pinned shares persist
 

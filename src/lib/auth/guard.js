@@ -22,7 +22,7 @@ export async function requireUser() {
 /**
  * For admin-only route handlers. Beyond the session role, the address is
  * re-checked against ADMIN_EMAILS now, so revoking an admin takes effect at
- * once rather than when their 45-day login runs out.
+ * once rather than when their login eventually lapses.
  */
 export async function requireAdmin() {
   const gate = await requireUser();

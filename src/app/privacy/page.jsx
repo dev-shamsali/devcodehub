@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" updated="16 October 2026">
+    <LegalPage title="Privacy Policy" updated="17 October 2026">
       <section>
         <p>
           {SITE.name} is a small project run by {AUTHOR.name}. This page explains in plain
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
         <h2>Cookies</h2>
         <p>
           We set one essential session cookie when you log in. It keeps you signed in and expires
-          45 days after you log in, or when you log out. We also set short-lived security cookies
+          when you log out, or after a year without use. We also set short-lived security cookies
           used by sign-in. We do not use advertising cookies.
         </p>
       </section>

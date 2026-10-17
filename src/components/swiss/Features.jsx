@@ -22,7 +22,7 @@ const ROWS = [
   },
   {
     title: 'Signed in, then signed out',
-    body: 'Log in with email or Google. You stay signed in for 45 days, or until you log out.',
+    body: 'Log in with email or Google. You stay signed in until you log out.',
   },
 ];
 

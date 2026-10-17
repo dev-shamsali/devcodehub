@@ -1,19 +1,29 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { sessionExpiry, isExpired, SESSION_DAYS } from '../src/lib/auth/expiry.js';
+import { sessionExpiry, isExpired, SESSION_DAYS, RENEW_SECONDS } from '../src/lib/auth/expiry.js';
 
 const DAY = 24 * 60 * 60 * 1000;
 
-test('a session lasts exactly 45 days from sign-in', () => {
-  assert.equal(SESSION_DAYS, 45);
-  assert.equal(sessionExpiry(1_000_000), 1_000_000 + 45 * DAY);
+test('an active session is kept alive for a year', () => {
+  assert.equal(SESSION_DAYS, 365);
+  assert.equal(sessionExpiry(1_000_000), 1_000_000 + 365 * DAY);
 });
 
-test('still valid on day 44, over on day 45', () => {
-  const start = Date.parse('2026-10-16T08:00:00Z');
-  const end = sessionExpiry(start);
-  assert.equal(isExpired(end, start + 44 * DAY), false);
-  assert.equal(isExpired(end, start + 45 * DAY), true);
+test('each visit pushes the cutoff out again', () => {
+  const login = Date.parse('2026-10-17T08:00:00Z');
+  const firstCutoff = sessionExpiry(login);
+  const laterVisit = login + 200 * DAY;
+  assert.equal(isExpired(firstCutoff, laterVisit), false);
+  assert.ok(sessionExpiry(laterVisit) > firstCutoff);
+});
+
+test('a year with no visit ends the login', () => {
+  const login = Date.parse('2026-10-17T08:00:00Z');
+  assert.equal(isExpired(sessionExpiry(login), login + 366 * DAY), true);
+});
+
+test('the cookie is renewed about daily', () => {
+  assert.equal(RENEW_SECONDS, 24 * 60 * 60);
 });
 
 test('missing or malformed cutoff counts as expired', () => {
